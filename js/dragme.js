@@ -185,15 +185,20 @@
 	};
 
 	PageController.prototype = {
-		// {current} - boolean
+		// {setAsCurrent} - boolean
 		// if set to 'true' new page become a current
-		new: function (current) {
+		new: function (setAsCurrent) {
 			var page = new Page(this.layout, this);
 			this.pages.push(page);
 			
 			page.init();
 
-			if (current) {
+			// if just one page in a row, it will be set as current
+			if (this.pages.length === 1) {
+				this.currentIdx = 0;
+			}
+
+			if (setAsCurrent) {
 				return this.current(this.pages.length - 1);
 			}
 			return page;
@@ -201,18 +206,23 @@
 		// set current page by its number
 		// get current page
 		current: function (num) {
-			if (!num && (this.currentIdx !== -1)) {
+			// 'num' cannot be negative
+			num = Math.abs(num);
+			// if 'num' is not specified a current page will be return
+			if (num === undefined && this.currentIdx !== -1) {
 				return this.pages[this.currentIdx];
 			}
-			else if (num && (this.currentIdx !== num)) {
-				// look for current page, remove class "current"
-				this.pages.forEach(function (page) {
-					if (page.isCurrent()) { page.$el.removeClass("current"); }
-				});
-				this.currentIdx = (num >= this.pages.length) ? this.pages.length -1 : num;
-				// set class "current" to the page which under 'num' index
-				this.pages[this.currentIdx].$el.addClass("current");
-				return this.pages[num];
+			else if (this.currentIdx !== num) {
+				console.log("from: %s to: %s", this.currentIdx, num);
+
+				// hide current page
+				this.pages[this.currentIdx].hide();
+				// switch a current page index to 'num' 
+				this.currentIdx = num;
+				// show a page with 'num' index
+				this.pages[this.currentIdx].show();
+							
+				return this.pages[this.currentIdx];
 			}
 			else {
 				return undefined;
@@ -241,15 +251,20 @@
 	// page fits layout
 	// can be multiple pages per layout
 	// Page containes sections
-	function Page (layout, pageController)
-	{
-		this.$el = $("<div>").addClass("page");
+	function Page (layout, pageController) {
+		this.$el = $("<div>").addClass("page animated");
 		this.layout = layout;
 		this.pctrl = pageController;
 		this.index = this.pctrl.pages.length;
 		this.rowCount  = this.layout.rowCount  || 0;
 		this.collCount = this.layout.collCount || 0;
 		this.layout.$el.append(this.$el);
+		// this point contains the coordinates for the page's initial position
+		// by default all pages initialize out of the screen 
+		this.initPoint = {
+			top: config.layoutPadding.top,
+			left: -this.layout.outerSize().width
+		};
 		// this.layout = [];
 
 		// initialization of the page
@@ -265,14 +280,7 @@
 
 	Page.prototype = {
 		init: function () {
-			var layoutInnerSize = this.layout.innerSize();
-			var clp = config.layoutPadding;
-			this.$el.css({
-				"top": clp.top,
-				"left": clp.left,
-				"width": layoutInnerSize.width,
-				"height":layoutInnerSize.height
-			});
+			this.hide();
 		},
 		isCurrent: function () {
 			return this.$el.hasClass("current");
@@ -281,7 +289,29 @@
 		// width, height - dimentions of a new section, in cells
 		allocate: function (width, height) {
 			// body...
+		},
+
+		show: function () {
+			var layoutInnerSize = this.layout.innerSize();
+			var clp = config.layoutPadding;
+			this.$el.css({
+				"top": clp.top,
+				"left": clp.left,
+				"width": layoutInnerSize.width,
+				"height":layoutInnerSize.height
+			}).addClass("current");
+		},
+
+		hide: function () {
+			var layoutInnerSize = this.layout.innerSize();
+			this.$el.css({
+				"top": this.initPoint.top,
+				"left": this.initPoint.left,
+				"width": layoutInnerSize.width,
+				"height":layoutInnerSize.height
+			}).removeClass("current");
 		}
+			
 
 		// add: function (section) {
 			// 1. calculate the size of the section.
@@ -388,36 +418,50 @@
 		}
 	};
 
+	var actions = {
+		init: function(options) {
+			config = $.extend({}, defaults, options);
 
-	$.fn.Layout = function(options)
-	{
+			return this.each(function() {
+				var element = $(this);
+				// first initialization
+				if (!element.data("layout")){
+					var layout = new Layout(element);
+					layout.init();
 
-		config = $.extend({}, defaults, options);
+					if (config.showGrid) {
+						layout.showInnerCells();
+					}
 
-		return this.each(function () {
-			var element = $(this);
-			
-			// first initialization
-			if ( !element.data("layout") )
-			{
-				var layout = new Layout(element);
-				layout.init();
-
-				if (config.showGrid) {
-					layout.showInnerCells();
+					element.data("layout", layout);
 				}
+			});
+		},
 
-				element.data("layout", layout);
+		page: function (num) {
+			var element = $(this);
+			var layout = element.data("layout");
+			if (layout) {
+				layout.pctrl.current(num);
 			}
-		});
-		// Method calling logic
-		// if ( methods[method] ) {
-		// 	return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-		// } else if ( typeof method === 'object' || ! method ) {
-		// 	return methods.init.apply( this, arguments );
-		// } else {
-		// 	$.error( 'Method ' +  method + ' does not exist on jQuery.cropping' );
-		// } 
-	}
+			return this;
+		}
+	};
 
-})(jQuery)
+	$.fn.Layout = function(method) {
+
+		// config = $.extend({}, defaults, options);
+
+		// return this.each(function () {
+			// Method calling logic
+		if ( actions[method] ) {
+			return actions[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
+		} else if ( typeof method === 'object' || ! method ) {
+			return actions.init.apply( this, arguments );
+		} else {
+			$.error( 'Method ' +  method + ' does not exist on jQuery.cropping' );
+		} 
+		// });
+	};
+
+})(jQuery);
