@@ -1,23 +1,21 @@
 (function($) {
 
-	var defaults =
-	{
+	var defaults = {
 		showGrid: true,
 		cellSize: {width:15, height:15},
 		cellMargin: {top:0, left:0, bottom:1, right:1},
 
-		layoutPadding: {top:10, left:10, bottom:25, right:10}
+		layoutPadding: {top:10, left:10, bottom:25, right:10},
+		pageInAnimateClass: "bounceIn",
+		pageOutAnimateClass: "bounceOut"
 	};
 
 	var config = { };
 
 	// _i static class
-	var _i =
-	{
+	var _i = {
 		// calculates an offset for the given element
-		offset:
-		function (el)
-		{
+		offset: function (el) {
 			if ( !el ) { return {x:0, y:0}; }
 			
 			var result = {x:0, y:0};
@@ -27,6 +25,18 @@
 			result.y += el.offsetTop;
 			
 			return result;
+		},
+
+		normalizeCoordinates: function (x, y) {
+			x -= this.offset.x;
+			y -= this.offset.y;
+			// prevent negative value for current coordinates
+			x = (x < 0) ? 0 : x;
+			y = (y < 0) ? 0 : y;
+			// prevent coordinates recalculation out of the layout border
+			x = (x > this.size.width) ? this.size.width : x;
+			y = (y > this.size.height) ? this.size.height : y;
+			return {x:x, y:y};
 		}
 	};
 
@@ -58,8 +68,8 @@
 			this.calculate();
 			
 			this.pctrl = new PageController(this);
-			this.pctrl.new();
 			this.pctrl.new(true);
+			this.pctrl.new();
 			// layout should contain at least one page
 			// this.pages.push(new Page(this));
 			// $(window).on("resize.layout", function() { self.resize(); });
@@ -84,20 +94,8 @@
 			this.$el.css({"width": this.size.width, "height": this.size.height });
 		},
 
-		normalizeCoordinates: function (x, y) {
-			x -= this.offset.x;
-			y -= this.offset.y;
-			// prevent negative value for current coordinates
-			x = (x < 0) ? 0 : x;
-			y = (y < 0) ? 0 : y;
-			// prevent coordinates recalculation out of the layout border
-			x = (x > this.size.width) ? this.size.width : x;
-			y = (y > this.size.height) ? this.size.height : y;
-			return {x:x, y:y};
-		},
-
 		onMouseMove: function (e) {
-			var axis = this.normalizeCoordinates(e.clientX, e.clientY);
+			var axis = _i.normalizeCoordinates.call(this, e.clientX, e.clientY);
 			var currCell = this.getCellPosByXY(axis.x,axis.y);
 			var status = [
 				"x: "+axis.x+" y: "+axis.y,
@@ -190,13 +188,15 @@
 		new: function (setAsCurrent) {
 			var page = new Page(this.layout, this);
 			this.pages.push(page);
-			
+			// this determines a page size 
 			page.init();
 
 			// if just one page in a row, it will be set as current
 			if (this.pages.length === 1) {
 				this.currentIdx = 0;
+				this.pages[this.currentIdx].show();
 			}
+			
 
 			if (setAsCurrent) {
 				return this.current(this.pages.length - 1);
@@ -214,13 +214,14 @@
 			}
 			else if (this.currentIdx !== num) {
 				console.log("from: %s to: %s", this.currentIdx, num);
-
+				var that = this;
 				// hide current page
-				this.pages[this.currentIdx].hide();
+				this.pages[this.currentIdx].hide(function() {
 				// switch a current page index to 'num' 
-				this.currentIdx = num;
-				// show a page with 'num' index
-				this.pages[this.currentIdx].show();
+					that.currentIdx = num;
+					// show a page with 'num' index
+					that.pages[that.currentIdx].show();
+				});
 							
 				return this.pages[this.currentIdx];
 			}
@@ -266,7 +267,7 @@
 			left: -this.layout.outerSize().width
 		};
 		// this.layout = [];
-
+		this.init();
 		// initialization of the page
 		// for (var r = 0; r < this.rowCount; r++) {
 			// this.layout[r] = [];
@@ -280,7 +281,14 @@
 
 	Page.prototype = {
 		init: function () {
-			this.hide();
+			var layoutInnerSize = this.layout.innerSize();
+			var clp = config.layoutPadding;
+			this.$el.css({
+				"top": clp.top,
+				"left": clp.left,
+				"width": layoutInnerSize.width,
+				"height":layoutInnerSize.height
+			});
 		},
 		isCurrent: function () {
 			return this.$el.hasClass("current");
@@ -292,24 +300,18 @@
 		},
 
 		show: function () {
-			var layoutInnerSize = this.layout.innerSize();
-			var clp = config.layoutPadding;
-			this.$el.css({
-				"top": clp.top,
-				"left": clp.left,
-				"width": layoutInnerSize.width,
-				"height":layoutInnerSize.height
-			}).addClass("current");
+			this.$el.show().addClass("current "+config.pageInAnimateClass);
+			setTimeout(function () {
+				this.$el.removeClass(config.pageInAnimateClass);
+			}.bind(this), 1000);
 		},
 
-		hide: function () {
-			var layoutInnerSize = this.layout.innerSize();
-			this.$el.css({
-				"top": this.initPoint.top,
-				"left": this.initPoint.left,
-				"width": layoutInnerSize.width,
-				"height":layoutInnerSize.height
-			}).removeClass("current");
+		hide: function (callback) {
+			this.$el.removeClass("current").addClass(config.pageOutAnimateClass);
+			setTimeout(function () {
+				this.$el.hide().removeClass(config.pageOutAnimateClass);
+			}.bind(this), 1000);
+			setTimeout(callback.bind(this), 600);
 		}
 			
 

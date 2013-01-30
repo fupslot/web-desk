@@ -39,11 +39,12 @@ html, body {
 	color: #fff;
 	letter-spacing: 1px;
 	font-family: Arial;
-	opacity: 0.5;
 }
 	.layout .page {
 		position: absolute;
+		/*opacity: 0;*/
 		display: none;
+		z-index: 500;
 
 		-webkit-transition: all 1s ease 0s;
 		-moz-transition: all 1s ease 0s;
@@ -52,16 +53,15 @@ html, body {
 	/*!!! temp code*/
 	.layout .page:nth-child(3) {
 		background-color: green;
-		opacity: 0.5;
 	}
 	.layout .page:nth-child(2) {
 		background-color: red;
-		opacity: 0.5;
 	}
 	/*!!! temp code*/
 
 	.layout .page.current {
 		display: block;
+		z-index: 1000;
 	}
 		
 .grid {
