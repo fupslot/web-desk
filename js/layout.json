@@ -1,0 +1,19 @@
+{
+	"pageSelected": "[page index]",
+	"pageCount": "7",
+	"pages": [
+		{
+			"index": "0",
+			"items": [
+				{
+					"id": "hash",
+					"layout": {
+						"el": "[jquery element]",
+						"rect": [0,0,0,0,],
+						"pageIdx": "[page index]"
+					}
+				}
+			]
+		}
+	]
+}

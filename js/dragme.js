@@ -40,8 +40,30 @@
 		}
 	};
 
+	// ===========================
+	// = LAYOUT PRIVATE FUNCTION =
+	// ===========================
+	var layoutOnMouseMoveEvent = function(e) {
+		this.cursor = _i.normalizeCoordinates.call(this, e.clientX, e.clientY);
+		// =================
+		// = !!! TEMP CODE =
+		// =================
+		var currCell = this.getCellPosByXY(this.cursor.x,this.cursor.y);
+		var status = [
+			"x: "+this.cursor.x+" y: "+this.cursor.y,
+			"rows:"+this.rowCount+" colls:"+this.collCount,
+			"w:"+this.size.width+" h:"+this.size.height,
+			"current: row:"+currCell.row+" coll:"+currCell.coll
+		].join(" ");
+		$(".status", this.$el).text(status);
+		// =================
+	};
+	// ===========================
+
 	function Layout(el) {
 		this.$el = el;
+
+		this.cursor = {x:0, y:0};
 		
 		this.offset = _i.offset(this.$el[0]);
 		// add a layout margin to offset
@@ -62,7 +84,7 @@
 			this.$el.on({
 				// "mousedown": function (e) { self.onMouseDown(e); },
 				// "mouseup":   function (e) { self.onMouseUp(e); },
-				"mousemove": function (e) { self.onMouseMove(e); }
+				"mousemove": function (e) { layoutOnMouseMoveEvent.call(self, e); }
 			});
 
 			this.calculate();
@@ -92,18 +114,6 @@
 			// that the current layout can fit, set its the certain size
 			this.size = this.outerSize();
 			this.$el.css({"width": this.size.width, "height": this.size.height });
-		},
-
-		onMouseMove: function (e) {
-			var axis = _i.normalizeCoordinates.call(this, e.clientX, e.clientY);
-			var currCell = this.getCellPosByXY(axis.x,axis.y);
-			var status = [
-				"x: "+axis.x+" y: "+axis.y,
-				"rows:"+this.rowCount+" colls:"+this.collCount,
-				"w:"+this.size.width+" h:"+this.size.height,
-				"current: row:"+currCell.row+" coll:"+currCell.coll
-			].join(" ");
-			$(".status", this.$el).text(status);
 		},
 
 		// returns a cell size including its margin
@@ -189,7 +199,7 @@
 			var page = new Page(this.layout, this);
 			this.pages.push(page);
 			// this determines a page size 
-			page.init();
+			// page.init();
 
 			// if just one page in a row, it will be set as current
 			if (this.pages.length === 1) {
@@ -249,6 +259,23 @@
 		} 
 	};
 
+	// ==========================
+	// = PAGE PRIVATE FUNCTIONS =
+	// ==========================
+	var setPageEvents = function() {
+		var self = this;
+		this.$el.on("click.itemClickEvent", function(e){
+			pageItemOnClick.call(self, e);
+		});
+	};
+
+	var pageItemOnClick = function(e) {
+		var cursor = this.layout.cursor;
+		console.dir(cursor);
+	};
+	// ==========================
+
+
 	// page fits layout
 	// can be multiple pages per layout
 	// Page containes sections
@@ -289,6 +316,13 @@
 				"width": layoutInnerSize.width,
 				"height":layoutInnerSize.height
 			});
+			var $item = $("<div>").addClass("item");
+			this.$el.append($item);
+			// ====================
+			// = SETS PAGE EVENTS =
+			// ====================
+			setPageEvents.call(this);
+			// ====================
 		},
 		isCurrent: function () {
 			return this.$el.hasClass("current");
@@ -313,7 +347,6 @@
 			}.bind(this), 1000);
 			setTimeout(callback.bind(this), 600);
 		}
-			
 
 		// add: function (section) {
 			// 1. calculate the size of the section.
@@ -327,98 +360,94 @@
 
 
 	// widget
-	function Dragme (el)
-	{
-		this.element  = el;
-		this.dragging = false;
+	// function Dragme (el) {
+	// 	this.$el = el;
+	// 	this.dragging = false;
 		
-		// element's offset
-		this.offset = {x:0, y:0};
-		// start coordinates
-		this.start  = {x:0, y:0};
-	}
-	// methods
-	Dragme.prototype = 
-	{
+	// 	// element's offset
+	// 	this.offset = {x:0, y:0};
+	// 	// start coordinates
+	// 	this.start  = {x:0, y:0};
+	// 	this.init();
+	// }
+	// // methods
+	// Dragme.prototype = {
 
-		init:
-		function ()
-		{
-			var self = this;
-			// set default cursor
-			this.element.css("cursor", "pointer");
-			this.element.on({
-				"mousedown": function (e) { self.onMouseDown(e); },
-				"mouseup":   function (e) { self.onMouseUp(e); },
-				"mousemove": function (e) { self.onMouseMove(e); }
-			});
-		},
+	// 	init: function () {
+	// 		var self = this;
+	// 		// set default cursor
+	// 		this.$el.css("cursor", "pointer");
+	// 		this.$el.on({
+	// 			"mousedown": function (e) { self.onMouseDown(e); },
+	// 			"mouseup":   function (e) { self.onMouseUp(e); },
+	// 			"mousemove": function (e) { self.onMouseMove(e); },
+	// 			"mouseleave": function (e) { self.onMouseUp(e); }
+	// 		});
+	// 	},
 
-		onMouseDown:
-		function (e)
-		{
-			var $target =  $(e.currentTarget);
+	// 	onMouseDown: function (e) {
+	// 		var $target =  $(e.currentTarget);
 
-			// gets offset for a target element
-			this.offset = _i.offset($target[0]);
-			console.dir(this.offset);
-			// set start coordinates
-			this.start.x = e.clientX;
-			this.start.y = e.clientY;
+	// 		// gets offset for a target element
+	// 		this.offset = _i.offset($target[0]);
+	// 		console.dir(this.offset);
+	// 		// set start coordinates
+	// 		this.start.x = e.clientX;
+	// 		this.start.y = e.clientY;
+	// 		console.dir({
+	// 			"this.start.x": e.clientX,
+	// 			"this.start.y": e.clientY
+	// 		});
+				
 
-			// wrap the element by place holder
-			// this.element.wrap($("<div>").addClass("dragly-placeholder"));
+	// 		// wrap the $el by place holder
+	// 		// this.$el.wrap($("<div>").addClass("dragly-placeholder"));
 
-			// detach the drag element 
-			$target.detach();
+	// 		// detach the drag element 
+	// 		// $target.detach();
 			
-			// make sure that nothing be over the element
-			$target.css({
-				"zIndex": 10000,
-				"position": "absolute",
-				"top" : this.offset.y,
-				"left": this.offset.x
-			});
+	// 		// make sure that nothing be over the element
+	// 		$target.css({
+	// 			"zIndex": 10000,
+	// 			"position": "absolute",
+	// 			"top" : this.offset.y,
+	// 			"left": this.offset.x
+	// 		});
 			
-			// move into body element as absolut positioned
-			$target.prependTo("body");
+	// 		// move into body $el as absolut positioned
+	// 		// $target.prependTo("body");
 
-			// console.log(this.offset);
-			// add a placeholder for current 
-			// TODO
-			this.dragging = true;
+	// 		// console.log(this.offset);
+	// 		// add a placeholder for current 
+	// 		// TODO
+	// 		this.dragging = true;
 
-			if ( e.preventDefault ) { e.preventDefault(); }
-		},
+	// 		e.preventDefault();
+	// 	},
 
-		onMouseUp:
-		function (e)
-		{
-			this.offset = {x:0, y:0};
-			// sets a start point
-			this.start  = {x:0, y:0};
+	// 	onMouseUp: function (e) {
+	// 		// back to init point
+	// 		this.start  = {x:0, y:0};
+	// 		this.offset = {x:0, y:0};
 
-			this.dragging = false;
-		},
+	// 		this.dragging = false;
+	// 	},
 
-		onMouseMove:
-		function (e)
-		{
-			if ( !this.dragging ) { return; }
+	// 	onMouseMove: function (e) {
+	// 		if ( !this.dragging ) { return; }
+	// 		var $target =  $(e.currentTarget);
 			
-			var dx = 0, dy = 0;
-			dx = (this.offset.x + e.clientX - this.start.x);
-			dy = (this.offset.y + e.clientY - this.start.y);
-			
+	// 		var dx = 0, dy = 0;
+	// 		dx = (this.offset.x + e.clientX - this.start.x);
+	// 		dy = (this.offset.y + e.clientY - this.start.y);
 
-		},
+	// 		$target.css({"top" : dy, "left": dx});
+	// 	},
 
-		destroy:
-		function ()
-		{
-			this.element.off("mousedown mouseup");
-		}
-	};
+	// 	destroy: function () {
+	// 		this.$el.off("mousedown mouseup mousemove");
+	// 	}
+	// };
 
 	var actions = {
 		init: function(options) {
