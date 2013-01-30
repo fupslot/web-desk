@@ -58,6 +58,32 @@
 		$(".status", this.$el).text(status);
 		// =================
 	};
+
+	var layoutInit = function(){
+		// cache this values, to prevent recalculate cell's outer size
+		this.cellSize = this.outerCellSize();
+		
+		var self = this;
+		this.$el.on({
+			// "mousedown": function (e) { self.onMouseDown(e); },
+			// "mouseup":   function (e) { self.onMouseUp(e); },
+			"mousemove": function (e) { layoutOnMouseMoveEvent.call(self, e); }
+		});
+
+		this.calculate();
+		
+		// ==========================
+		// = CREATES 7 LAYOUT PAGES =
+		// ==========================
+		this.pctrl = new PageController(this);
+		this.pctrl.new(true);
+		this.pctrl.new();
+		// ==========================
+		
+		// layout should contain at least one page
+		// this.pages.push(new Page(this));
+		// $(window).on("resize.layout", function() { self.resize(); });
+	};
 	// ===========================
 
 	function Layout(el) {
@@ -73,30 +99,14 @@
 		this.rowCount  = 0;
 		this.collCount = 0;
 		this.pctrl;
+
+		// {data} - contains actual User's layout data
+		this.data = undefined;
+
+		layoutInit.call(this);
 	};
 
 	Layout.prototype = {
-		init: function () {
-			// cache this values, to prevent recalculate cell's outer size
-			this.cellSize = this.outerCellSize();
-			
-			var self = this;
-			this.$el.on({
-				// "mousedown": function (e) { self.onMouseDown(e); },
-				// "mouseup":   function (e) { self.onMouseUp(e); },
-				"mousemove": function (e) { layoutOnMouseMoveEvent.call(self, e); }
-			});
-
-			this.calculate();
-			
-			this.pctrl = new PageController(this);
-			this.pctrl.new(true);
-			this.pctrl.new();
-			// layout should contain at least one page
-			// this.pages.push(new Page(this));
-			// $(window).on("resize.layout", function() { self.resize(); });
-		},
-
 		calculate: function () {
 			var clp = config.layoutPadding;
 			// initial size on the layout, is a el size minus its padding
@@ -454,24 +464,23 @@
 			config = $.extend({}, defaults, options);
 
 			return this.each(function() {
-				var element = $(this);
+				var $element = $(this);
 				// first initialization
-				if (!element.data("layout")){
-					var layout = new Layout(element);
-					layout.init();
+				if (!$element.data("layout")){
+					var layout = new Layout($element);
 
 					if (config.showGrid) {
 						layout.showInnerCells();
 					}
 
-					element.data("layout", layout);
+					$element.data("layout", layout);
 				}
 			});
 		},
 
 		page: function (num) {
-			var element = $(this);
-			var layout = element.data("layout");
+			var $element = $(this);
+			var layout = $element.data("layout");
 			if (layout) {
 				layout.pctrl.current(num);
 			}
