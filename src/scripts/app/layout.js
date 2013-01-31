@@ -29,7 +29,7 @@ function ($, helper, config, PageCtrl) {
 	};
 
 	var layoutOnMouseMoveEvent = function(e) {
-		this.cursor = _i.normalizeCoordinates.call(this, e.clientX, e.clientY);
+		this.cursor = normalizeCoordinates.call(this, e.clientX, e.clientY);
 		// =================
 		// = !!! TEMP CODE =
 		// =================

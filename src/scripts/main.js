@@ -13,8 +13,6 @@ require.config({
 	}
 });
 
-require(["jquery", "mustache", "app/app"], function ($, Mustache, app) {
-	var html = Mustache.render("<p>{{name}}</p>", {"name": "Eugene Brodsky"});
-	$("body").append(html);
-	app.changeBackgroundColor("#e6e");
+require(["jquery", "app/app"], function ($, app) {
+	app.run();
 });

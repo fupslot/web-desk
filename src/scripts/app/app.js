@@ -4,7 +4,7 @@
  * Released under the MIT license
  */
  
-require(
+define(
 [
 	"jquery",
 	"app/helper",
@@ -13,11 +13,12 @@ require(
 ],
 
 function ($, helper, config, Layout) {
-	var changeBackgroundColor = function(color) {
-		$("body").css("background-color", color);
+
+	var run = function() {
+		var layout = new Layout($("div.layout"));
 	};
 
 	return {
-		"changeBackgroundColor": changeBackgroundColor
+		"run": run
 	};
 });
