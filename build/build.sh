@@ -4,11 +4,15 @@ echo "Building is done"
 echo ""
 echo ""
 
+cd ../release
+
 echo "Cleannig up the release directory..."
-rm ../release/build.txt
-rm ../release/scripts/.gitignore
-rm -r ../release/scripts/app
-rm -r ../release/scripts/lib/jquery
-rm -r ../release/scripts/lib/mustache
-rm -r ../release/scripts/lib/requirejs-i18n
+rm build.txt
+
+cd scripts
+rm .gitignore
+rm -r app
+rm -r lib/jquery
+rm -r lib/mustache
+rm -r lib/requirejs-i18n
 echo "DONE"
