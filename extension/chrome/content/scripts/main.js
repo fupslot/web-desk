@@ -11,11 +11,11 @@ require.config({
 		"mustache": "mustache/mustache",
 		"text": "requirejs-text/text",
 		"app": "../app",
-		"templates": "../templates"
+		"template": "../template"
 	}
 });
 
-require(["jquery", "app/app", "text!templates/text.html"], function ($, app, t_1) {
+require(["jquery", "app/app", "text!template/text."], function ($, app, t_1) {
 	console.log(t_1);
 	app.run();
 });
