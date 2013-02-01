@@ -1,0 +1,22 @@
+{
+	"version": "0.0.1",
+	"name": "Web-Desk",	
+	"description": "Some description",
+	"manifest_version": 2,	
+
+	"chrome_url_overrides": {
+		"newtab": "content/main.html"
+	},
+	"default_locale": "en",
+	"permissions": ["storage","unlimitedStorage","contextMenus","webNavigation","history","bookmarks","tabs","management","topSites","chrome://favicon/","http://*/*","https://*/*"],  
+	"icons": { 
+		"16": "icons/16.png",
+		"48": "icons/48.png",
+		"128": "icons/128.png" 
+	},
+	"web_accessible_resources": [ "content/main.html" ],
+	"sandbox": {
+		"pages": []
+	},
+	"minimum_chrome_version" : "23"
+}
