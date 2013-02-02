@@ -13,14 +13,24 @@ define(
 ],
 
 function ($, helper, config, Layout) {
-
+	var layout = undefined;
 	// =========================
 	// = RUNS THE APPLICATION! =
 	// =========================
 	var run = function() {
-		var layout = new Layout($("div.layout"));
+		layout = new Layout($("div.layout"));
 	};
 	// =========================
+
+	// ==========================
+	// = ON WINDOW RESIZE EVENT =
+	// ==========================
+	$(window).on("resize", function() {
+		if (layout !== undefined) {
+			layout.calculate();
+		}
+	});
+	// ==========================
 
 	return {
 		"run": run

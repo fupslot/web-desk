@@ -45,6 +45,7 @@ html, body {
 	color: #fff;
 	letter-spacing: 1px;
 	font-family: Arial;
+	opacity: 0.3;
 }
 	.layout .page {
 		position: absolute;
@@ -55,6 +56,8 @@ html, body {
 		-webkit-transition: all 1s ease 0s;
 		-moz-transition: all 1s ease 0s;
 		transition: all 1s ease 0s;
+
+		opacity: 0.5;
 	}
 	/*!!! temp code*/
 	.layout .page:nth-child(3) {

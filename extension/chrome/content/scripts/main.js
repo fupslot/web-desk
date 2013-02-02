@@ -15,7 +15,6 @@ require.config({
 	}
 });
 
-require(["jquery", "app/app", "text!template/text."], function ($, app, t_1) {
-	console.log(t_1);
+require(["app/app"], function (app) {
 	app.run();
 });

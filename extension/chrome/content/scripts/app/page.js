@@ -10,14 +10,18 @@ define(["jquery", "app/config"], function ($, config) {
 	// ==========================
 	var setPageEvents = function() {
 		var self = this;
-		this.$el.on("click.itemClickEvent", function(e){
+		this.$el.on("click.itemClickEvent", function(e) {
 			pageItemOnClick.call(self, e);
 		});
 	};
 
 	var pageItemOnClick = function(e) {
 		var cursor = this.layout.cursor;
-		console.dir(cursor);
+		// console.dir(cursor);
+		var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
+		var coords = this.layout.getCellCoordsByPos(cell.row, cell.coll);
+		console.dir(cell);
+		console.dir(coords);
 	};
 	// ==========================
 
@@ -40,8 +44,8 @@ define(["jquery", "app/config"], function ($, config) {
 		// this point contains the coordinates for the page's initial position
 		// by default all pages initialize out of the screen 
 		this.initPoint = {
-			top: config.layoutPadding.top,
-			left: -this.layout.outerSize().width
+			top: this.layout.padding.top,
+			left: -this.layout.size.width
 		};
 		// this.layout = [];
 		this.init();
@@ -58,14 +62,15 @@ define(["jquery", "app/config"], function ($, config) {
 
 	Page.prototype = {
 		init: function () {
-			var layoutInnerSize = this.layout.innerSize();
-			var clp = config.layoutPadding;
+			var layoutInner = this.layout.inner;
+			var clp = this.layout.padding;
 			this.$el.css({
 				"top": clp.top,
 				"left": clp.left,
-				"width": layoutInnerSize.width,
-				"height":layoutInnerSize.height
+				"width": layoutInner.width,
+				"height":layoutInner.height
 			});
+
 			var $item = $("<div>").addClass("item");
 			this.$el.append($item);
 			// ====================
