@@ -88,9 +88,6 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 
 		this.cursor = {x:0, y:0};
 		
-		// add a layout margin to offset
-		this.offset = helper.offset(this.$el[0]);
-		
 		this.rowCount  = 0;
 		this.collCount = 0;
 		this.pctrl;
@@ -99,7 +96,7 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 		this.inner = {"width":0, "height":0};
 		this.size  = {"width":0, "height":0};
 
-		// {data} - contains actual User's layout data
+		// {data} - contains an actual User's layout data
 		this.data = undefined;
 
 		layoutInit.call(this);
@@ -107,6 +104,9 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 
 	Layout.prototype = {
 		calculate: function () {
+			// add a layout margin to offset
+			this.offset = helper.offset(this.$el[0]);
+
 			var clp = config.layoutPadding;
 			// the layout size should always fit its parent element
 			// gets a size of a parent element
@@ -167,8 +167,8 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 			var topShift  = row * (size.height + margin.bottom);
 			var leftShift = coll * (size.width + margin.right);
 
-			var top = this.padding.top + ((row + 1) * margin.top) + topShift);
-			var left = this.padding.left + ((coll +1) * margin.left) + leftShift);
+			var top = this.padding.top + ((row + 1) * margin.top) + topShift;
+			var left = this.padding.left + ((coll +1) * margin.left) + leftShift;
 
 			return {
 				"top": top,

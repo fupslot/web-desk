@@ -20,8 +20,6 @@ define(["jquery", "app/config"], function ($, config) {
 		// console.dir(cursor);
 		var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
 		var coords = this.layout.getCellCoordsByPos(cell.row, cell.coll);
-		console.dir(cell);
-		console.dir(coords);
 	};
 	// ==========================
 
