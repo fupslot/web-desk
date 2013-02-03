@@ -11,6 +11,7 @@ require.config({
 		"mustache": "mustache/mustache",
 		"text": "requirejs-text/text",
 		"app": "../app",
+		"data": "../app/data",
 		"template": "../template"
 	}
 });

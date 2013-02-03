@@ -13,9 +13,17 @@ define(function () {
 			
 			return result;
 	};
+
+	var is = function (type, obj) {
+		var clas = Object.prototype.toString.call(obj).slice(8, -1);
+		return obj !== undefined && obj !== null && clas === type;
+	};
 	// ==============================================
 	
 	return {
-		offset: offset
+		"offset": offset,
+		"isArray": function (obj) {
+			return is("Array", obj);
+		}
 	};
 });
