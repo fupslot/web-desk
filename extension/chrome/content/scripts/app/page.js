@@ -4,64 +4,78 @@
  * Released under the MIT license
  */
  
-define(["jquery", "app/config"], function ($, config) {
+define(["jquery", "app/config", "app/pagesurface"], 
+
+function ($, config, PageSurface) {
+	"use strict";
 	// ==========================
 	// = PAGE PRIVATE FUNCTIONS =
 	// ==========================
 	var setPageEvents = function() {
-		var self = this;
 		this.$el.on("click.itemClickEvent", function(e) {
-			pageItemOnClick.call(self, e);
-		});
+			pageItemOnClick.call(this, e);
+		}.bind(this));
 	};
 
 	var pageItemOnClick = function(e) {
-		var cursor = this.layout.cursor;
-		// console.dir(cursor);
-		var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
-		var coords = this.layout.getCellCoordsByPos(cell.row, cell.coll);
+		// var cursor = this.layout.cursor;
+		
+		// ==================
+		// = FOR DEBUG ONLY =
+		// ==================
+		// var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
+		// allocate space on surface
+		var pos = this.surface.allocate(2, 2);
+		if (pos !== null) {
+			var coords = this.layout.getCellCoordsByPos(pos.row, pos.coll);
+
+			var $item = $("<div>")
+				.addClass("item")
+				.css({
+					"top": coords.top,
+					"left": coords.left
+				});
+			this.$el.append($item);
+		}
+		// ==================
 	};
 	// ==========================
 
 	// ========
 	// = !!!! =
 	// ========
-	// page fits layout
-	// can be multiple pages per layout
-	// Page containes sections
+	// Page must store an information about sections that lay on its surface
+	// 
+	// 
 	// ========
 
 	var Page = function (layout, pageController) {
-		this.$el = $("<div>").addClass("page animated");
 		this.layout = layout;
 		this.pctrl = pageController;
 		this.index = this.pctrl.pages.length;
 		this.rowCount  = this.layout.rowCount  || 0;
 		this.collCount = this.layout.collCount || 0;
-		this.layout.$el.append(this.$el);
+		this.surface = null;
 		// this point contains the coordinates for the page's initial position
 		// by default all pages initialize out of the screen 
 		this.initPoint = {
 			top: this.layout.padding.top,
 			left: -this.layout.size.width
 		};
-		// this.layout = [];
+		
 		this.init();
-		// initialization of the page
-		// for (var r = 0; r < this.rowCount; r++) {
-			// this.layout[r] = [];
-			// for (var c = 0; c < this.collCount; c++) {
-				// this.layout[r][c] = 0;
-			// }
-		// }
-		// !!! layout tells to a page how many sections it has to fit
-		// !!! page should tell how many space it has
 	};
 
 	Page.prototype = {
 		init: function () {
 			var layoutInner = this.layout.inner;
 			var clp = this.layout.padding;
+			
+			this.$el = $("<div>")
+				.addClass("page animated")
+				.attr("data-idx", this.index);
+
+			this.layout.$el.append(this.$el);
 			this.$el.css({
 				"top": clp.top,
 				"left": clp.left,
@@ -69,8 +83,12 @@ define(["jquery", "app/config"], function ($, config) {
 				"height":layoutInner.height
 			});
 
-			var $item = $("<div>").addClass("item");
-			this.$el.append($item);
+			// ===========================
+			// = ALLOCATE PAGE'S SURFACE =
+			// ===========================
+			this.surface = new PageSurface(this.collCount, this.rowCount);
+			// ===========================
+
 			// ====================
 			// = SETS PAGE EVENTS =
 			// ====================
@@ -79,11 +97,6 @@ define(["jquery", "app/config"], function ($, config) {
 		},
 		isCurrent: function () {
 			return this.$el.hasClass("current");
-		},
-		// this method allocates enough space for given section size
-		// width, height - dimentions of a new section, in cells
-		allocate: function (width, height) {
-			// body...
 		},
 
 		show: function () {

@@ -4,7 +4,23 @@
  * Released under the MIT license
  */
 
-define(["app/page"], function (Page) {
+define(["app/page", "app/helper"], function (Page, helper) {
+	"use strict";
+	// experimental
+	// @size - Array. A size of an element [rows, colls]
+	var exper = function(size) {
+		if (helper.isArray(size)) {
+			throw "Wrong type of argument";
+		}
+		// start scan a current page
+		// var space = lookForSpace(page);
+		// if (space !== undefined) {
+		// 
+		// }
+		// if no space, scan all rest pages from left to right
+
+	};
+
 		// Page controller is managing the pages
 	var PageCtrl = function (layout) {
 		this.layout = layout;
@@ -36,21 +52,21 @@ define(["app/page"], function (Page) {
 		// get current page
 		current: function (num) {
 			// 'num' cannot be negative
-			num = Math.abs(num);
+			num = Math.abs(num) || null;
 			// if 'num' is not specified a current page will be return
-			if (num === undefined && this.currentIdx !== -1) {
+			if (num === null && this.currentIdx !== -1) {
 				return this.pages[this.currentIdx];
 			}
-			else if (this.currentIdx !== num) {
+			else if (num !== null && this.currentIdx !== num) {
 				console.log("from: %s to: %s", this.currentIdx, num);
-				var that = this;
+				// var that = this;
 				// hide current page
 				this.pages[this.currentIdx].hide(function() {
 				// switch a current page index to 'num' 
-					that.currentIdx = num;
+					this.currentIdx = num;
 					// show a page with 'num' index
-					that.pages[that.currentIdx].show();
-				});
+					this.pages[this.currentIdx].show();
+				}.bind(this));
 							
 				return this.pages[this.currentIdx];
 			}
@@ -74,7 +90,17 @@ define(["app/page"], function (Page) {
 		add: function (section) {
 			// 1. calculate the size of the section.
 			// 2. find a certain size on the page for the section
-			// 2.1 if there is no enought space a new page would be created
+			// |o|o|o|x|o|o|o|o|o|o|o|o|
+			// |x|x|o|o|o|o|x|x|x|o|o|o|
+			// |x|x|o|o|o|o|x|x|x|o|o|o|
+			// |o|o|o|o|o|o|x|x|x|o|o|o|
+			// |o|o|o|o|o|o|o|o|o|o|o|o|
+			// |o|o|o|o|o|o|o|o|o|o|o|o|
+			// |o|o|o|o|o|o|o|o|o|o|o|o|
+			// |o|o|o|o|o|o|o|o|o|o|o|o|
+
+			// |x|x|x|
+			// |x|x|x|
 		} 
 	};
 

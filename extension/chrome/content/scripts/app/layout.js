@@ -59,17 +59,17 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 
 		this.calculate();
 		
-		// ==========================
-		// = CREATES 7 LAYOUT PAGES =
-		// ==========================
+		// ===================
+		// = CREATES 5 PAGES =
+		// ===================
 		this.pctrl = new PageCtrl(this);
+		this.pctrl.new();
+		this.pctrl.new();
 		this.pctrl.new(true);
+		this.pctrl.new();
 		this.pctrl.new();
 		// ==========================
 		
-		// layout should contain at least one page
-		// this.pages.push(new Page(this));
-		// $(window).on("resize.layout", function() { self.resize(); });
 	};
 
 	// returns a cell size including its margin

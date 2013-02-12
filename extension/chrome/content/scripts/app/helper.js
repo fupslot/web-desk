@@ -22,6 +22,15 @@ define(function () {
 	
 	return {
 		"offset": offset,
+		
+		"isArray": function (obj) {
+			return is("Array", obj);
+		},
+
+		"isObject": function (obj) {
+			return is("Object", obj);
+		},
+
 		"isArray": function (obj) {
 			return is("Array", obj);
 		}
