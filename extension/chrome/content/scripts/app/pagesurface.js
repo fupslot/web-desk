@@ -10,9 +10,11 @@ define(function () {
 	// |x|x|o|o|o|o|x|x|x|o|o|o|
 	// |o|o|o|o|o|o|x|x|x|o|o|o|
 	// |o|o|o|o|o|o|o|o|o|o|o|o|
+	// |o|o|o|o|x|x|o|o|o|o|o|o|
 	// |o|o|o|o|o|o|o|o|o|o|o|o|
 	// |o|o|o|o|o|o|o|o|o|o|o|o|
-	// |o|o|o|o|o|o|o|o|o|o|o|o|
+
+	// var items = [];
 
 	function PageSurface (width, height) {
 		this.width  = width;
@@ -95,17 +97,20 @@ define(function () {
 			for (var row = 0, rl = this.height; row < rl; row++) {
 				for (var coll = 0, cl = this.width; coll < cl; coll++) {
 					if (this.surface[row][coll] === 0) {
+						// The cell is empty.
+						// Testing if it has enough space around 
+						// to fit a rectangle with given size.
 						test = this.testPos(row, coll, width, height);
-						// console.log(test);
+						
 						if (test === 0) {
 							pos = {"row": row, "coll": coll};
 							break;
 						}
-						// jump to next row, if width went beyond the surface
+						// jump to next row, if the width went beyond the surface
 						if (test === -2) { break; } 
 					}
 				}
-				// stop seek process if height went beyond the surface
+				// stop a seeking process if height went beyond the surface
 				// or if position was found
 				if (test === 0) { break; }
 				test = null;
@@ -113,13 +118,13 @@ define(function () {
 			return pos;
 		},
 
-		allocate: function (width, height) {
-			var pos = this.findPos.apply(this, arguments);
-			// console.dir(pos);
+		allocate: function (colls, rows) {
+			var pos = this.findPos(colls, rows);
+			
 			if (pos !== null) {
-				// fill the surface
-				for (var row = pos.row, rl = row + height; row < rl; row++) {
-					for (var coll = pos.coll, cl = coll + width; coll < cl; coll++) {
+				// filling up the surface
+				for (var row = pos.row, rl = row + rows; row < rl; row++) {
+					for (var coll = pos.coll, cl = coll + colls; coll < cl; coll++) {
 						this.surface[row][coll] = 1;
 					}
 				}
@@ -127,8 +132,74 @@ define(function () {
 			return pos;
 		},
 
-		release: function (argument) {
-			// body...
+		release: function (coll, row, width, height) {
+			for (var r = 0; r < height; r++) {
+				for (var c = 0; c < width; c++) {
+					this.surface[row + r][coll + c] = 0;
+				}
+			}
+		},
+
+		contentSize: function () {
+			var height = -1;
+			var width  = -1;
+			
+			for (var r = this.height - 1; r >= 0; r--) {
+				if (height === -1 && this.surface[r].lastIndexOf(1) !== -1) {
+					height = r;
+				}
+
+				if (width < this.surface[r].lastIndexOf(1)) {
+					width = this.surface[r].lastIndexOf(1);
+				}
+
+				if (height !== -1 && width === this.width) {
+					break;
+				}
+			}
+
+			return {"width": width + 1, "height": height + 1};
+		},
+
+		resize: function (colls, rows) {
+			if (this.width == colls && this.height == rows) { return; }
+
+			var rDiff = rows  - this.height;
+			var cDiff = colls - this.width;
+
+			if (rDiff > 0) {
+				for (var r = 0; r < rDiff; r++) {
+					this.surface.push([]);
+					for (var c = 0; c < this.width; c++) {
+						this.surface[this.surface.length-1].push(0);
+					}
+				}
+
+				this.height = rows;
+			}
+
+			if (rDiff < 0) {
+				this.surface.splice(this.surface.length - Math.abs(rDiff))
+				this.height = rows;
+			}
+
+			if (cDiff > 0) {
+				for (var r = 0; r < this.height; r++) {
+					for (var c = 0; c < cDiff; c++) {
+						this.surface[r].push(0);
+					}
+				}
+
+				this.width = colls;
+			}
+
+			if (cDiff < 0) {
+				for (var r = 0; r < this.height; r++) {
+					this.surface[r].splice(this.surface[r].length - Math.abs(cDiff));
+				}
+
+				this.width = colls;
+			}
 		}
 	};
 

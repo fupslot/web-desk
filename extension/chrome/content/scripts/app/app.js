@@ -13,7 +13,7 @@ define(
 ],
 
 function ($, helper, config, Layout) {
-	window.layout = undefined;
+	window.layout = null;
 	// =========================
 	// = RUNS THE APPLICATION! =
 	// =========================

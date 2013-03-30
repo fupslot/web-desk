@@ -50,12 +50,13 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 		// cache this values, to prevent recalculate cell's outer size
 		this.cellSize = outerCellSize.call(this);
 		
-		var self = this;
-		this.$el.on({
-			// "mousedown": function (e) { self.onMouseDown(e); },
-			// "mouseup":   function (e) { self.onMouseUp(e); },
-			"mousemove": function (e) { layoutOnMouseMoveEvent.call(self, e); }
-		});
+		if (config.showStatus) {
+			this.$el.append("<div class=\"status\"></div>");
+			this.$el.on({
+				"mousemove": function (e) { layoutOnMouseMoveEvent.call(this, e); }.bind(this)
+			});
+		}
+			
 
 		this.calculate();
 		
@@ -90,7 +91,7 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 		
 		this.rowCount  = 0;
 		this.collCount = 0;
-		this.pctrl;
+		this.pctrl = null;
 
 		this.padding = {"left":0, "right":0, "top":0, "bottom":0};
 		this.inner = {"width":0, "height":0};
@@ -104,9 +105,6 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 
 	Layout.prototype = {
 		calculate: function () {
-			// add a layout margin to offset
-			this.offset = helper.offset(this.$el[0]);
-
 			var clp = config.layoutPadding;
 			// the layout size should always fit its parent element
 			// gets a size of a parent element
@@ -122,8 +120,22 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 			};
 
 			// gets a rows and colls amount that can be fit on layout
-			this.rowCount  = Math.floor(parentInner.height / this.cellSize.height);
-			this.collCount = Math.floor(parentInner.width  / this.cellSize.width);
+			var grid = {
+				"rows": Math.floor(parentInner.height / this.cellSize.height),
+				"colls": Math.floor(parentInner.width  / this.cellSize.width)
+			};
+
+			// !!!
+			if (this.pctrl) {
+				var cSize = this.pctrl.contentSize();
+				if (grid.rows < cSize.height || grid.colls < cSize.width ) { return; }
+			}
+
+			this.rowCount  = grid.rows;
+			this.collCount = grid.colls;
+
+			// add a layout margin to offset
+			this.offset = helper.offset(this.$el[0]);
 
 			// gets layout inner dimentions
 			this.inner.width  = (this.collCount * this.cellSize.width);
@@ -148,6 +160,10 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 			this.size = parentSize;
 			this.$el.css({"width": this.size.width, "height": this.size.height });
 
+			if ( this.pctrl ) {
+				this.pctrl.resize();
+			};
+
 			if (config.showGrid) {
 				this.showInnerCells();
 			}
@@ -160,19 +176,35 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 			};
 		},
 
-		getCellCoordsByPos: function(row, coll) {
+		getCellCoordsByPos: function(coll, row) {
 			var margin = config.cellMargin;
 			var size   = config.cellSize;
 
-			var topShift  = row * (size.height + margin.bottom);
-			var leftShift = coll * (size.width + margin.right);
+			var row  = row  + 1;
+			var coll = coll + 1;
 
-			var top = this.padding.top + ((row + 1) * margin.top) + topShift;
-			var left = this.padding.left + ((coll +1) * margin.left) + leftShift;
+			var topShift  = (row - 1)  * (size.height + margin.bottom);
+			var leftShift = (coll - 1) * (size.width  + margin.right);
+
+			var top  = (row  * margin.top)  + topShift;
+			var left = (coll * margin.left) + leftShift;
+			
+			return {
+				"top":    top,
+				"left":   left
+			};
+		},
+
+		getCellsDimention: function (colls, rows) {
+			var margin = config.cellMargin;
+			var size   = config.cellSize;
+
+			var width  = (size.width  * colls) + ((margin.left + margin.right) * (colls - 1));
+			var height = (size.height * rows)  + ((margin.top  + margin.bottom)  * (rows  - 1));
 
 			return {
-				"top": top,
-				"left": left
+				"width":  width,
+				"height": height
 			};
 		},
 		

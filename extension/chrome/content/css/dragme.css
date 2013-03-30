@@ -53,16 +53,18 @@ html, body {
 		display: none;
 		z-index: 500;
 
-		-webkit-transition: all 1s ease 0s;
+/*		-webkit-transition: all 1s ease 0s;
 		-moz-transition: all 1s ease 0s;
 		transition: all 1s ease 0s;
-
+*/
 		opacity: 0.5;
+		background-color: red;
 	}
 
 	.layout .page.current {
 		display: block;
 		z-index: 1000;
+		background-color: green;
 	}
 		
 .grid {

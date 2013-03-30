@@ -37,29 +37,33 @@ define(["app/page", "app/helper"], function (Page, helper) {
 			// this determines a page size 
 			// page.init();
 
-			// if just one page in a row, it will be set as current
-			if (this.pages.length === 1) {
-				this.currentIdx = 0;
-				this.pages[this.currentIdx].show();
-			}
+			// if only one page exist, it will be set as current
+			// if (this.pages.length === 1) {
+			// 	this.currentIdx = 0;
+			// 	this.pages[this.currentIdx].show();
+			// }
 			
 			if (setAsCurrent) {
 				return this.current(this.pages.length - 1);
 			}
 			return page;
 		},
-		// set current page by its number
-		// get current page
+		// sets a current page
+		// gets a current page
 		current: function (num) {
 			// 'num' cannot be negative
-			num = Math.abs(num) || null;
+			if (num !== undefined) {
+				num = Math.abs(num);
+			}
+				
 			// if 'num' is not specified a current page will be return
-			if (num === null && this.currentIdx !== -1) {
+			if (num === undefined && this.currentIdx !== -1) {
 				return this.pages[this.currentIdx];
 			}
-			else if (num !== null && this.currentIdx !== num) {
+			
+			if (num !== undefined && this.currentIdx !== -1 && this.currentIdx !== num) {
 				console.log("from: %s to: %s", this.currentIdx, num);
-				// var that = this;
+				
 				// hide current page
 				this.pages[this.currentIdx].hide(function() {
 				// switch a current page index to 'num' 
@@ -70,9 +74,12 @@ define(["app/page", "app/helper"], function (Page, helper) {
 							
 				return this.pages[this.currentIdx];
 			}
-			else {
-				return undefined;
-			}
+
+			if (this.currentIdx === -1 && num !== undefined) {
+					this.currentIdx = num;
+					// show a page with 'num' index
+					this.pages[this.currentIdx].show();				
+			} 
 		},
 		// shows a last page
 		last: function () {
@@ -82,7 +89,33 @@ define(["app/page", "app/helper"], function (Page, helper) {
 		// shows a first page
 		first: function () {
 			return this.current(0);
-		}, 
+		},
+
+		resize: function () {
+			this.pages.forEach(function (page, pageIdx) {
+				if (this.currentIdx === pageIdx) {
+					page.resize();
+				}
+				else {
+					page.hasResized = false;
+				}
+			}.bind(this));
+		},
+
+		contentSize: function () {
+			var size = {"width": 0, "height": 0};
+
+			this.pages.forEach(function (page) {
+				var pageGrid = page.surface.contentSize();
+
+				size.width  = (pageGrid.width  - size.width)  > 0 ? pageGrid.width  : size.width;
+				size.height = (pageGrid.height - size.height) > 0 ? pageGrid.height : size.height;
+
+				pageGrid = null;
+			});
+
+			return size;
+		},
 
 		// adds a section into a page
 		// {section.address} - by a section address page controller knows 
