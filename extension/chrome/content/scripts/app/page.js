@@ -4,9 +4,9 @@
  * Released under the MIT license
  */
  
-define(["jquery", "app/config", "app/pagesurface"], 
+define(["jquery", "app/config", "app/surface", "app/dd"], 
 
-function ($, config, PageSurface) {
+function ($, config, Surface, DDHandler) {
 	"use strict";
 	// ==========================
 	// = PAGE PRIVATE FUNCTIONS =
@@ -15,22 +15,25 @@ function ($, config, PageSurface) {
 		this.$el.on("click.itemClickEvent", function(e) {
 			pageItemOnClick.call(this, e);
 		}.bind(this));
+
+		this.DD = new DDHandler(this.layout, this);
+		// DDHandler($el).done();
 	};
 
 	var pageItemOnClick = function(e) {
 		// ==================
 		// = FOR DEBUG ONLY =
 		// ==================
-		
-		if (e.target.className.indexOf("item") > -1) {
-			var elem = e.target;
-			var pos = /(\d+)\,(\d+)/.exec(elem.getAttribute("data-pos"));
-			var size = /(\d+)\,(\d+)/.exec(elem.getAttribute("data-size"));
-// debugger;
-			this.surface.release(parseInt(pos[1]), parseInt(pos[2]), parseInt(size[1]), parseInt(size[2]));
-			elem.parentElement.removeChild(elem);
-			return;
-		}
+		// deletes an item by clicking on it
+		// if (e.target.className.indexOf("item") > -1) {
+		// 	var elem = e.target;
+		// 	var pos = /(\d+)\,(\d+)/.exec(elem.getAttribute("data-pos"));
+		// 	var size = /(\d+)\,(\d+)/.exec(elem.getAttribute("data-size"));
+
+		// 	this.surface.release(parseInt(pos[1]), parseInt(pos[2]), parseInt(size[1]), parseInt(size[2]));
+		// 	elem.parentElement.removeChild(elem);
+		// 	return;
+		// }
 		// ==================
 		// var cursor = this.layout.cursor;
 		
@@ -39,22 +42,26 @@ function ($, config, PageSurface) {
 		// ==================
 		// var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
 		// allocate space on surface
-		var pos = this.surface.allocate(1, 1);
+		
+		var pos = this.surface.allocate(this.__cell.coll,this.__cell.row);
 		if (pos !== null) {
 			var coords = this.layout.getCellCoordsByPos(pos.coll, pos.row);
-			var dims   = this.layout.getCellsDimention(1, 1);
+			var dims   = this.layout.getCellsDimention(this.__cell.coll,this.__cell.row);
 
-			var $item = $("<div>")
-				.attr("data-pos",  pos.coll+ "," + pos.row)
-				.attr("data-size", 1 + "," + 1)
-				.addClass("item")
-				.css({
+			var $item = $("<div>", {
+				"data-pos":  pos.coll+ "," + pos.row,
+				"data-size": this.__cell.coll + "," + this.__cell.row,
+				"draggable": true,
+				"class": "item"
+			}).css({
 					"top": coords.top,
 					"left": coords.left,
 					"width": dims.width,
 					"height": dims.height
 				});
 			this.$el.append($item);
+
+			this.DD.registerEvents($item.get(0));
 		}
 		// ==================
 	};
@@ -78,6 +85,9 @@ function ($, config, PageSurface) {
 		this.index = this.pctrl.pages.length;
 		this.surface = null;
 
+		// placeholder
+		this.$ph = null;
+
 		this.hasResized = true;
 		// this point contains the coordinates for the page's initial position
 		// by default all pages initialize out of the screen 
@@ -85,6 +95,9 @@ function ($, config, PageSurface) {
 			top: this.layout.padding.top,
 			left: -this.layout.size.width
 		};
+
+		// !!!
+		this.__cell = {coll:2, row:3}
 		
 		this.init();
 	};
@@ -102,7 +115,7 @@ function ($, config, PageSurface) {
 			// ===========================
 			// = ALLOCATE PAGE'S SURFACE =
 			// ===========================
-			this.surface = new PageSurface(this.collCount, this.rowCount);
+			this.surface = new Surface(this.collCount, this.rowCount);
 			// ===========================
 
 			// ====================
@@ -162,6 +175,42 @@ function ($, config, PageSurface) {
 					elem.style.left = coords.left + "px";
 				}
 			}.bind(this));
+		},
+
+		showPlaceholder: function (coll, row, width, height) {
+			if ( this.DD.__DD) {
+				// return;
+				if ( ! this.$ph) {
+					this.$ph = $("<div>", {"class": "placeholder", });
+					this.$el.append(this.$ph);
+				}
+
+				var pos 	= this.DD.__DD.pos;
+				var size 	= this.DD.__DD.size;
+
+				var coords = this.layout.getCellCoordsByPos(pos.coll, pos.row);
+				var dim = this.layout.getCellsDimention(size.width, size.height);
+
+				this.$ph.css({
+					"top": coords.top + "px",
+					"left": coords.left + "px",
+					"width": dim.width + "px",
+					"height": dim.height + "px"
+				});
+			}
+		},
+
+		hidePlaceholder: function () {
+			if (this.$ph) {
+				this.$ph.remove();
+				this.$ph = null;
+			}
+		},
+
+		contain: function (x, y, w, h) {
+			var inner = this.layout.inner;
+
+			return x >= 0 && y >= 0 && (x + w) <= inner.width && (y + h) <= inner.height;
 		},
 
 		// create a new item on a page

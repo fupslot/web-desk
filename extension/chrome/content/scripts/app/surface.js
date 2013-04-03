@@ -1,5 +1,5 @@
 /*!
- * PageSurface
+ * Surface
  * Copyright 2013 Fupslot
  * Released under the MIT license
  */
@@ -15,15 +15,22 @@ define(function () {
 	// |o|o|o|o|o|o|o|o|o|o|o|o|
 
 	// var items = [];
+	function changeSurface (coll, row, width, height, value) {
+		for (var r = 0; r < height; r++) {
+			for (var c = 0; c < width; c++) {
+				this.surface[row + r][coll + c] = value;
+			}
+		}
+	}
 
-	function PageSurface (width, height) {
+	function Surface (width, height) {
 		this.width  = width;
 		this.height = height;
 		this.surface = null;
 		this.initialize();
 	}
 
-	PageSurface.prototype = {
+	Surface.prototype = {
 		initialize: function () {
 			this.surface = [];
 
@@ -57,7 +64,7 @@ define(function () {
 		},
 		// ===========================
 
-		hasBorderCollision: function (row, coll, width, height) {
+		hasBorderCollision: function (coll, row, width, height) {
 			if ( (row + height) > this.height ) {
 				return -1; // row collision
 			}
@@ -70,7 +77,7 @@ define(function () {
 			}
 		},
 
-		testPos: function (rowStart, collStart, width, height) {
+		testPos: function (collStart, rowStart, width, height) {
 			// check border collisions
 			var collision = this.hasBorderCollision.apply(this, arguments);
 			// console.log("collision " + collision);
@@ -99,8 +106,8 @@ define(function () {
 					if (this.surface[row][coll] === 0) {
 						// The cell is empty.
 						// Testing if it has enough space around 
-						// to fit a rectangle with given size.
-						test = this.testPos(row, coll, width, height);
+						// to fit a rectangle of given size.
+						test = this.testPos(coll, row, width, height);
 						
 						if (test === 0) {
 							pos = {"row": row, "coll": coll};
@@ -122,22 +129,17 @@ define(function () {
 			var pos = this.findPos(colls, rows);
 			
 			if (pos !== null) {
-				// filling up the surface
-				for (var row = pos.row, rl = row + rows; row < rl; row++) {
-					for (var coll = pos.coll, cl = coll + colls; coll < cl; coll++) {
-						this.surface[row][coll] = 1;
-					}
-				}
+				changeSurface.call(this, pos.coll, pos.row, colls, rows, 1);
 			}
 			return pos;
 		},
 
+		hold: function (coll, row, width, height) {
+			changeSurface.call(this, coll, row, width, height, 1);
+		},
+
 		release: function (coll, row, width, height) {
-			for (var r = 0; r < height; r++) {
-				for (var c = 0; c < width; c++) {
-					this.surface[row + r][coll + c] = 0;
-				}
-			}
+			changeSurface.call(this, coll, row, width, height, 0);
 		},
 
 		contentSize: function () {
@@ -203,5 +205,5 @@ define(function () {
 		}
 	};
 
-	return PageSurface;
+	return Surface;
 });

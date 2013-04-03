@@ -19,8 +19,8 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 	// = LAYOUT PRIVATE FUNCTION =
 	// ===========================
 	var normalizeCoordinates = function (x, y) {
-		x -= this.offset.left;
-		y -= this.offset.top;
+		x -= this.offset.left + this.padding.left;
+		y -= this.offset.top + this.padding.top;
 		// prevent negative value for current coordinates
 		x = (x < 0) ? 0 : x;
 		y = (y < 0) ? 0 : y;

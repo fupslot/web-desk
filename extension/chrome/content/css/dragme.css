@@ -66,60 +66,13 @@ html, body {
 		z-index: 1000;
 		background-color: green;
 	}
+
+	.layout .page.current .placeholder {
+		position: absolute;
+		background-color: black;
+		z-index: 0;
+	}
 		
 .grid {
 	background-image: url(../images/grid.png);
-}
-
-div.drop-container:after {
-	content: "";
-	height: 1px;
-	clear: both;
-	display: block;
-}
-
-div.dragly {
-	float: left;
-	/*margin: 3px;*/
-	display: block;
-	width: 50px;
-	height: 50px;
-	background-color: red;
-	color: white;
-	font-size: 40px;
-	font-weight: bolder;
-	text-align: center;
-}
-
-div.dragly-placeholder {
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: green;
-	display: block;
-	width: 50px;
-	height: 50px;
-}
-
-div.droply {
-	float: left;
-	/*margin: 3px;*/
-	display: block;
-	width: 50px;
-	height: 50px;
-	background-color: gray;
-	color: white;
-	font-size: 40px;
-	font-weight: bolder;
-	text-align: center;
-}
-
-div.droply-placeholder {
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: yellow;
-	display: block;
-	width: 50px;
-	height: 50px;
 }
