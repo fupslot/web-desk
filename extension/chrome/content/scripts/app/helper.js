@@ -19,9 +19,31 @@ define(function () {
 		return obj !== undefined && obj !== null && clas === type;
 	};
 	// ==============================================
+
+	// Returns a function that will be executed at most one time, no matter how
+	// often you call it. Useful for lazy initialization.
+	var once = function(func) {
+		var ran = false, memo;
+		return function() {
+			if (ran) return memo;
+			ran = true;
+			memo = func.apply(this, arguments);
+			func = null;
+			return memo;
+		};
+	};
+
+	function genNewID() {
+		return 'xxxxxxxx'.replace(/[x]/g, function(c) {
+			var r = Math.random()*16|0;
+			return v.toString(16);
+		});
+	}
 	
 	return {
 		"offset": offset,
+		"genNewID": genNewID,
+		"once": once,
 		
 		"isArray": function (obj) {
 			return is("Array", obj);

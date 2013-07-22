@@ -14,6 +14,17 @@
 		"48": "icons/48.png",
 		"128": "icons/128.png" 
 	},
+	
+	"omnibox": { "keyword" : "yeah" },
+	
+	"background": {
+		"scripts": [
+			"background.js",
+			"content/scripts/lib/underscore-amd/underscore-min.js",
+			"storage.js"
+		]
+	},
+
 	"web_accessible_resources": [ "content/main.html" ],
 	"sandbox": {
 		"pages": []

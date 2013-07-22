@@ -4,19 +4,29 @@
  * Released under the MIT license
  */
  
-define(["jquery", "app/config", "app/surface", "app/dd"], 
+define(
 
-function ($, config, Surface, DDHandler) {
+	[
+		"jquery",
+		"app/config",
+		"app/surface",
+		// "app/dd",
+		"app/events",
+		"app/link"
+	],
+
+
+function ($, config, Surface, Events, Link) {
 	"use strict";
 	// ==========================
 	// = PAGE PRIVATE FUNCTIONS =
 	// ==========================
 	var setPageEvents = function() {
-		this.$el.on("click.itemClickEvent", function(e) {
+		this.$el.on("dblclick.itemClickEvent", function(e) {
 			pageItemOnClick.call(this, e);
 		}.bind(this));
 
-		this.DD = new DDHandler(this.layout, this);
+		// this.DD = new DDHandler(this.layout, this);
 		// DDHandler($el).done();
 	};
 
@@ -24,64 +34,44 @@ function ($, config, Surface, DDHandler) {
 		// ==================
 		// = FOR DEBUG ONLY =
 		// ==================
-		// deletes an item by clicking on it
-		// if (e.target.className.indexOf("item") > -1) {
-		// 	var elem = e.target;
-		// 	var pos = /(\d+)\,(\d+)/.exec(elem.getAttribute("data-pos"));
-		// 	var size = /(\d+)\,(\d+)/.exec(elem.getAttribute("data-size"));
-
-		// 	this.surface.release(parseInt(pos[1]), parseInt(pos[2]), parseInt(size[1]), parseInt(size[2]));
-		// 	elem.parentElement.removeChild(elem);
-		// 	return;
-		// }
-		// ==================
-		// var cursor = this.layout.cursor;
-		
-		// ==================
-		// = FOR DEBUG ONLY =
-		// ==================
 		// var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
 		// allocate space on surface
 		
-		var pos = this.surface.allocate(this.__cell.coll,this.__cell.row);
-		if (pos !== null) {
-			var coords = this.layout.getCellCoordsByPos(pos.coll, pos.row);
-			var dims   = this.layout.getCellsDimention(this.__cell.coll,this.__cell.row);
+		// var pos = this.surface.allocate(this.__cell.coll,this.__cell.row);
+		// if (pos !== null) {
+		// 	var coords = this.layout.getCellCoordsByPos(pos.coll, pos.row);
+		// 	var dims   = this.layout.getCellsDimention(this.__cell.coll,this.__cell.row);
 
-			var $item = $("<div>", {
-				"data-pos":  pos.coll+ "," + pos.row,
-				"data-size": this.__cell.coll + "," + this.__cell.row,
-				"draggable": true,
-				"class": "item"
-			}).css({
-					"top": coords.top,
-					"left": coords.left,
-					"width": dims.width,
-					"height": dims.height
-				});
-			this.$el.append($item);
+		// 	var $item = $("<div>", {
+		// 		// "data-pos":  pos.coll+ "," + pos.row,
+		// 		// "data-size": this.__cell.coll + "," + this.__cell.row,
+		// 		"draggable": true,
+		// 		"class": "item"
+		// 	}).css({
+		// 		"top": coords.top,
+		// 		"left": coords.left,
+		// 		"width": dims.width,
+		// 		"height": dims.height
+		// 	});
 
-			this.DD.registerEvents($item.get(0));
-		}
+		if (!$.isArray(this.links)) { this.links = []; }
+		this.links.push(new Link(this));
+
+		// 	$item.data("pos", {'coll': pos.coll, 'row': pos.row});	
+		// 	$item.data("size", {'width': this.__cell.coll, 'height': this.__cell.row});
+
+		// 	this.$el.append($item);
+
+			// this.DD.registerEvents($item.get(0));
+		// }
 		// ==================
 	};
 	// ==========================
 
-	// var item = this.surface.items[0];
-	// item.row;
-	// item.coll;
-
-	// ========
-	// = !!!! =
-	// ========
-	// Page must store an information about sections that lay on its surface
-	// 
-	// 
-	// ========
-
 	var Page = function (layout, pageCtrl) {
 		this.layout = layout;
 		this.pctrl = pageCtrl;
+		
 		this.index = this.pctrl.pages.length;
 		this.surface = null;
 
@@ -97,7 +87,7 @@ function ($, config, Surface, DDHandler) {
 		};
 
 		// !!!
-		this.__cell = {coll:2, row:3}
+		this.__cell = {coll:3, row:2}
 		
 		this.init();
 	};
@@ -166,45 +156,11 @@ function ($, config, Surface, DDHandler) {
 			}
 
 			this.$el.children().each(function (idx, elem) {
-				var size = elem.getAttribute("data-pos");
-				var r = /(\d+)\,(\d+)/.exec(size);
-
-				if (r.length && r.length == 3) {
-					var coords = this.layout.getCellCoordsByPos(parseInt(r[1]), parseInt(r[2]));
-					elem.style.top  = coords.top  + "px";
-					elem.style.left = coords.left + "px";
-				}
+				var pos = $(elem).data('pos');
+				var coords = this.layout.getCellCoordsByPos(pos);
+				elem.style.top  = coords.top  + "px";
+				elem.style.left = coords.left + "px";
 			}.bind(this));
-		},
-
-		showPlaceholder: function (coll, row, width, height) {
-			if ( this.DD.__DD) {
-				// return;
-				if ( ! this.$ph) {
-					this.$ph = $("<div>", {"class": "placeholder", });
-					this.$el.append(this.$ph);
-				}
-
-				var pos 	= this.DD.__DD.pos;
-				var size 	= this.DD.__DD.size;
-
-				var coords = this.layout.getCellCoordsByPos(pos.coll, pos.row);
-				var dim = this.layout.getCellsDimention(size.width, size.height);
-
-				this.$ph.css({
-					"top": coords.top + "px",
-					"left": coords.left + "px",
-					"width": dim.width + "px",
-					"height": dim.height + "px"
-				});
-			}
-		},
-
-		hidePlaceholder: function () {
-			if (this.$ph) {
-				this.$ph.remove();
-				this.$ph = null;
-			}
 		},
 
 		contain: function (x, y, w, h) {
@@ -222,9 +178,9 @@ function ($, config, Surface, DDHandler) {
 			// 2.1 if there is no enought space a new page would be created
 			// 
 		}
-
-
 	};
+
+	Page.prototype = $.extend(Page.prototype, Events);
 
 	return Page;
 });

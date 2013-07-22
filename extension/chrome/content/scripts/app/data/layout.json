@@ -1,32 +1,26 @@
 {
-	"pageSelected": "[page index]",
-	"pageCount": "7",
-	"pages": [
-		{
-			"index": "0",
-			"items": [
-				{
-					"id": "hash",
-					"layout": {
-						"el": "[jquery element]",
-						"rect": [0,0,0,0,],
-						"pageIdx": "[page index]"
-					},
-					"group": "[group id]"
-				}
-			]
-		}
-	],
+	"pageSelected": 0,
+	"pagesTotal": 5,
 
-	"groups": [
+	"items": [
 		{
-			"id": "[group id]",
-			"items": [
-				{
-					"id": "[hash]",
-					"rect": [0,0,0,0]
-				}
-			]
+			"id": "ac4edfc2",
+			"type": "link",
+			"size": [3,2],
+			"position": [0,0],
+			"pageIndex": 0
+		},
+		{
+			"id": "ba5fbc34",
+			"type": "link",
+			"size": [3,2],
+			"position": [5,0],
+			"pageIndex": 0
+		},
+		{
+			"id": "ga5fbc34",
+			"type": "group",
+			"items": ["ac4edfc2"]
 		}
 	]
 }

@@ -4,50 +4,30 @@
  * Released under the MIT license
  */
 
-define(["app/page", "app/helper"], function (Page, helper) {
+define(
+
+	[
+		"app/page",
+		"app/helper",
+		"app/events"
+	], 
+
+
+function (Page, helper, Events) {
 	"use strict";
-	// experimental
-	// @size - Array. A size of an element [rows, colls]
-	var exper = function(size) {
-		if (helper.isArray(size)) {
-			throw "Wrong type of argument";
-		}
-		// start scan a current page
-		// var space = lookForSpace(page);
-		// if (space !== undefined) {
-		// 
-		// }
-		// if no space, scan all rest pages from left to right
 
-	};
-
-		// Page controller is managing the pages
+	// Page controller is managing the pages
 	var PageCtrl = function (layout) {
 		this.layout = layout;
 		this.pages = [];
-		this.currentIdx = -1;
+		this.currentIdx = 0;
+
+		this.pages.push(new Page(layout, this));
+
+		if (this.pages[this.currentIdx]) { this.pages[this.currentIdx].show(); }
 	};
 
 	PageCtrl.prototype = {
-		// {setAsCurrent} - boolean
-		// if set to 'true' new page become a current
-		new: function (setAsCurrent) {
-			var page = new Page(this.layout, this);
-			this.pages.push(page);
-			// this determines a page size 
-			// page.init();
-
-			// if only one page exist, it will be set as current
-			// if (this.pages.length === 1) {
-			// 	this.currentIdx = 0;
-			// 	this.pages[this.currentIdx].show();
-			// }
-			
-			if (setAsCurrent) {
-				return this.current(this.pages.length - 1);
-			}
-			return page;
-		},
 		// sets a current page
 		// gets a current page
 		current: function (num) {
@@ -136,6 +116,8 @@ define(["app/page", "app/helper"], function (Page, helper) {
 			// |x|x|x|
 		} 
 	};
+
+	PageCtrl.prototype = $.extend(PageCtrl.prototype, Events);
 
 	return PageCtrl;
 });

@@ -11,10 +11,11 @@ define(
 	"app/helper", 
 	"app/config",
 	"app/pagectrl",
+	"app/events",
 	"text!template/innercell.html"
 ],
 
-function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
+function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 	// ===========================
 	// = LAYOUT PRIVATE FUNCTION =
 	// ===========================
@@ -35,42 +36,34 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 		// =================
 		// = !!! TEMP CODE =
 		// =================
-		var currCell = this.getCellPosByXY(this.cursor.x,this.cursor.y);
-		var status = [
-			"x: "+this.cursor.x+" y: "+this.cursor.y,
-			"rows:"+this.rowCount+" colls:"+this.collCount,
-			"w:"+this.size.width+" h:"+this.size.height,
-			"current: row:"+currCell.row+" coll:"+currCell.coll
-		].join(" ");
-		$(".status", this.$el).text(status);
+		if (config.showStatus) {
+			var currCell = this.getCellPosByXY(this.cursor.x,this.cursor.y);
+			var status = [
+				"x: "+this.cursor.x+" y: "+this.cursor.y,
+				"rows:"+this.rowCount+" colls:"+this.collCount,
+				"w:"+this.size.width+" h:"+this.size.height,
+				"current: row:"+currCell.row+" coll:"+currCell.coll
+			].join(" ");
+			$(".status", this.$el).text(status);
+		}
 		// =================
 	};
 
-	var layoutInit = function(){
+	var layoutInit = function() {
 		// cache this values, to prevent recalculate cell's outer size
 		this.cellSize = outerCellSize.call(this);
 		
-		if (config.showStatus) {
-			this.$el.append("<div class=\"status\"></div>");
-			this.$el.on({
-				"mousemove": function (e) { layoutOnMouseMoveEvent.call(this, e); }.bind(this)
-			});
-		}
-			
+		
+		this.$el.append("<div class=\"status\"></div>");
+		this.$el.on({
+			"mousemove": function (e) { layoutOnMouseMoveEvent.call(this, e); }.bind(this)
+		});
+
 
 		this.calculate();
 		
-		// ===================
-		// = CREATES 5 PAGES =
-		// ===================
+	
 		this.pctrl = new PageCtrl(this);
-		this.pctrl.new();
-		this.pctrl.new();
-		this.pctrl.new(true);
-		this.pctrl.new();
-		this.pctrl.new();
-		// ==========================
-		
 	};
 
 	// returns a cell size including its margin
@@ -96,9 +89,6 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 		this.padding = {"left":0, "right":0, "top":0, "bottom":0};
 		this.inner = {"width":0, "height":0};
 		this.size  = {"width":0, "height":0};
-
-		// {data} - contains an actual User's layout data
-		this.data = undefined;
 
 		layoutInit.call(this);
 	};
@@ -177,11 +167,19 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 		},
 
 		getCellCoordsByPos: function(coll, row) {
+			var pos;
+
+			if (typeof arguments[0] === 'object') { 
+				pos = $.extend({}, arguments[0]);
+			} else {
+				pos = {coll:coll, row:row};
+			}
+
 			var margin = config.cellMargin;
 			var size   = config.cellSize;
 
-			var row  = row  + 1;
-			var coll = coll + 1;
+			var row  = pos.row  + 1;
+			var coll = pos.coll + 1;
 
 			var topShift  = (row - 1)  * (size.height + margin.bottom);
 			var leftShift = (coll - 1) * (size.width  + margin.right);
@@ -189,18 +187,23 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 			var top  = (row  * margin.top)  + topShift;
 			var left = (coll * margin.left) + leftShift;
 			
-			return {
-				"top":    top,
-				"left":   left
-			};
+			return {'top':top, 'left':left};
 		},
 
-		getCellsDimention: function (colls, rows) {
+		getCellsDimention: function (coll, row) {
+			var dims;
+
+			if (typeof arguments[0] === 'object') { 
+				dims = $.extend({}, arguments[0]);
+			} else {
+				dims = {coll:coll, row:row};
+			}
+
 			var margin = config.cellMargin;
 			var size   = config.cellSize;
 
-			var width  = (size.width  * colls) + ((margin.left + margin.right) * (colls - 1));
-			var height = (size.height * rows)  + ((margin.top  + margin.bottom)  * (rows  - 1));
+			var width  = (size.width  * dims.coll) + ((margin.left + margin.right) * (dims.coll - 1));
+			var height = (size.height * dims.row)  + ((margin.top  + margin.bottom)  * (dims.row  - 1));
 
 			return {
 				"width":  width,
@@ -239,6 +242,8 @@ function ($, Mustache, helper, config, PageCtrl, t_innerCell) {
 
 		// destroy: function () { $(window).off("resize.layout"); }
 	};
+
+	Layout.prototype = $.extend(Layout.prototype, Events);
 	
 	return Layout;
 });
