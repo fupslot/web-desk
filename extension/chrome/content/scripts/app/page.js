@@ -25,54 +25,20 @@ function ($, config, Surface, Events, Link) {
 		this.$el.on("dblclick.itemClickEvent", function(e) {
 			pageItemOnClick.call(this, e);
 		}.bind(this));
-
-		// this.DD = new DDHandler(this.layout, this);
-		// DDHandler($el).done();
 	};
 
 	var pageItemOnClick = function(e) {
-		// ==================
-		// = FOR DEBUG ONLY =
-		// ==================
-		// var cell = this.layout.getCellPosByXY(cursor.x, cursor.y);
-		// allocate space on surface
-		
-		// var pos = this.surface.allocate(this.__cell.coll,this.__cell.row);
-		// if (pos !== null) {
-		// 	var coords = this.layout.getCellCoordsByPos(pos.coll, pos.row);
-		// 	var dims   = this.layout.getCellsDimention(this.__cell.coll,this.__cell.row);
 
-		// 	var $item = $("<div>", {
-		// 		// "data-pos":  pos.coll+ "," + pos.row,
-		// 		// "data-size": this.__cell.coll + "," + this.__cell.row,
-		// 		"draggable": true,
-		// 		"class": "item"
-		// 	}).css({
-		// 		"top": coords.top,
-		// 		"left": coords.left,
-		// 		"width": dims.width,
-		// 		"height": dims.height
-		// 	});
-
-		if (!$.isArray(this.links)) { this.links = []; }
-		this.links.push(new Link(this));
-
-		// 	$item.data("pos", {'coll': pos.coll, 'row': pos.row});	
-		// 	$item.data("size", {'width': this.__cell.coll, 'height': this.__cell.row});
-
-		// 	this.$el.append($item);
-
-			// this.DD.registerEvents($item.get(0));
-		// }
-		// ==================
+		this.createLink({size: {coll:2, row:2}});
 	};
 	// ==========================
 
-	var Page = function (layout, pageCtrl) {
-		this.layout = layout;
+	var Page = function (pageCtrl, id, group) {
+		this.layout = pageCtrl.layout;
 		this.pctrl = pageCtrl;
-		
-		this.index = this.pctrl.pages.length;
+		this.id = id;
+		this.group = typeof group === 'boolean' ? group : false;
+		// this.index = this.pctrl.pages.length;
 		this.surface = null;
 
 		// placeholder
@@ -86,17 +52,13 @@ function ($, config, Surface, Events, Link) {
 			left: -this.layout.size.width
 		};
 
-		// !!!
-		this.__cell = {coll:3, row:2}
 		
 		this.init();
 	};
 
 	Page.prototype = {
 		init: function () {
-			this.$el = $("<div>")
-				.addClass("page animated")
-				.attr("data-idx", this.index);
+			this.$el = $("<div>", {'class': 'page animated'});
 
 			this.layout.$el.append(this.$el);
 
@@ -118,15 +80,21 @@ function ($, config, Surface, Events, Link) {
 			return this.$el.hasClass("current");
 		},
 
-		show: function () {
+		show: function (silent) {
 			if ( ! this.hasResized ) {
 				this.resize();
 			}
 
-			this.$el.show().addClass("current "+config.pageInAnimateClass);
-			setTimeout(function () {
-				this.$el.removeClass(config.pageInAnimateClass);
-			}.bind(this), 1000);
+			if (!silent) {
+				this.$el.show().addClass("current "+config.pageInAnimateClass);
+
+				setTimeout(function () {
+					this.$el.removeClass(config.pageInAnimateClass);
+				}.bind(this), 1000);				
+			}
+			else {
+				this.$el.show().addClass("current");
+			}
 		},
 
 		hide: function (callback) {
@@ -143,7 +111,7 @@ function ($, config, Surface, Events, Link) {
 
 			this.rowCount  = this.layout.rowCount  || 0;
 			this.collCount = this.layout.collCount || 0;
-			
+
 			this.$el.css({
 				"top": clp.top,
 				"left": clp.left,
@@ -169,14 +137,34 @@ function ($, config, Surface, Events, Link) {
 			return x >= 0 && y >= 0 && (x + w) <= inner.width && (y + h) <= inner.height;
 		},
 
-		// create a new item on a page
-		create: function (item) {
-			// item.size - {row, coll};
+		// pageData - array
+		load: function(pageData) {
+			if (!pageData.forEach) { return; }
+			pageData.forEach(function(data){
+				if (data.type === 'link') {
+					this.createLink(data, true); // no animation needed
+				}
+			}.bind(this));
+		},
 
-			// 1. calculate the size of the section.
-			// 2. find a certain size on the page for the section
-			// 2.1 if there is no enought space a new page would be created
-			// 
+		/*
+			creates a new link on a page
+			data : {
+				size: {coll:2, row:2},
+				data: {
+					url: '',
+					imageURL: ''	
+				}
+			}
+
+			silent - no event, no visual animation 
+		*/
+		createLink: function (data, silent) {
+			if (!$.isArray(this.links)) { this.links = []; }
+
+			var link = new Link(this, data, silent);
+			this.links.push(link);
+			if (!silent) { this.layout.trigger('onLinkCreated', /*page*/this, link); }
 		}
 	};
 

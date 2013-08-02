@@ -14,8 +14,6 @@
 // ==================================================
 
 require.config({
-	"waitSeconds": "15",
-	"urlArgs": "bust="+(new Date()).getTime(),
 	"baseUrl": "scripts/lib",
 	"paths": {
 		"jquery": "jquery/jquery",
@@ -33,27 +31,57 @@ require(
 	"app/helper",
 	"app/config",
 	"app/layout",
-	"app/Events"
+	"app/Events",
+	'app/chrome/services'
 ],
 
-function ($, helper, config, Layout, Events) {
+function ($, helper, config, Layout, Events, Services) {
 	window.layout = null;
 
-		layout = new Layout($("div.layout"));
-		// ==========================
-		// = ON WINDOW RESIZE EVENT =
-		// ==========================
-		$(window).on("resize", function() {
-			if (layout !== undefined) {
-				layout.calculate();
-			}
-		});
-		// ==========================
-
-
-	chrome.runtime.getBackgroundPage(function(win){
-		console.log(win.DATA_LOADED);
+	// ==========================
+	// = ON WINDOW RESIZE EVENT =
+	// ==========================
+	$(window).on("resize", function() {
+		if (layout !== undefined) {
+			layout.calculate();
+		}
 	});
 
+	function onPageChanged (pageId) {
+		Services('storage', function(storage) {
+			storage.selectedPage = pageId;
+		});
+	}
 
+	function onItemDrop(item) {
+		Services('storage', function(storage) {
+			storage.save();
+		});
+	}
+
+	function onLinkCreated(page, link) {
+		Services('storage', function(storage) {
+			console.log(link.data);
+			storage.addItem(link.data);
+		});
+	}
+
+	function onPageData(pageId, callback) {
+		Services('storage', function(storage) {
+			callback(storage.getItems({type:'link', pageId:pageId}));
+		});
+	}
+	
+	Services('storage', function(storage) {
+		layout = new Layout($("div.layout"), {
+			selectedPage: storage.selectedPage.toString()
+		});
+
+		layout.on('onItemDrop', onItemDrop);
+		layout.on('onPageData', onPageData);
+		layout.on('onLinkCreated', onLinkCreated);
+		layout.on('onPageChanged', onPageChanged);
+		
+		layout.load();
+	});
 });

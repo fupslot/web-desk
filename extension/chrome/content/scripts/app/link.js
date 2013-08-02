@@ -6,52 +6,51 @@
 
 define(
     [
-        "jquery",
-        "mustache",
-        "app/dragable",
-        "text!template/link.html"
+        'jquery',
+        'app/Events',
+        'app/pageable',
+        'app/dragable',
+        'text!template/link.html'
     ],
 
-function ($, Mustache, Dragable, t_link) {
-    
-    var DEF_SIZE = {coll: 3, row: 2};
-
+function ($, Events, Pageable, Dragable, t_link) {
     /*
-        options - {pos: {top:0, left:0}, size:{coll:0, row:0}}
+        data : {
+            pos: {top:0, left:0},
+            size:{coll:0, row:0}, 
+            draggable: true|false,
+            data: {
+                url:'', 
+                imageURL: ''
+            }
+        }
     */
-    function Link(page, options) {
+    function Link(page, data, animated) {
         this.page   = page;
         this.layout = page.layout;
+        this.data = data || {};
 
-        var pos, coords, dims, size;
-
-        if (typeof options === 'object') {
-            pos  = options.pos;
-            size = options.size;
-        }
-        else {
-            pos = this.page.surface.allocate(DEF_SIZE.coll, DEF_SIZE.row);
-            if (pos === null) { throw 'No space available on the page'; }
-
-            size = DEF_SIZE;
+        if (!this.data.pageId) {
+            data.pageId = page.id;
         }
 
-        coords = this.layout.getCellCoordsByPos(pos);
-        dims   = this.layout.getCellsDimention(DEF_SIZE);
+        if (!this.data.type) {
+            this.data.type = 'link';
+        }
 
-        this.$el = $(Mustache.render(t_link, $.extend({'draggable':true}, dims, coords)));
-
-        this.$el.data("pos", pos);
-        this.$el.data("size", size);
-
-        this.page.$el.append(this.$el);
+        // Inherited from Pageable Class
+        this.initPageable(t_link);
         
-
-        // Inherited from Dragable
-        this.setAsDraggable();
+        if (this.data.draggable) {
+            // Inherited from Dragable
+            this.initDraggable();
+        }
     }
 
+
+    Link.prototype = $.extend(Link.prototype, Pageable);
     Link.prototype = $.extend(Link.prototype, Dragable);
+    Link.prototype = $.extend(Link.prototype, Events);
 
 
     return Link;

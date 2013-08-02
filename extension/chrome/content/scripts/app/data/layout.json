@@ -1,26 +1,33 @@
 {
-	"pageSelected": 0,
-	"pagesTotal": 5,
+	"selectedPage": 0,
 
 	"items": [
 		{
 			"id": "ac4edfc2",
 			"type": "link",
-			"size": [3,2],
-			"position": [0,0],
-			"pageIndex": 0
+			"size": {"coll": 3, "row": 2},
+			"pos": {"coll": 0, "row": 0},
+			"data": {
+				"url": "http://www.google.com",
+				"imageURL": "http://www.google.com/image.png"
+			},
+			"pageId": 0
 		},
 		{
 			"id": "ba5fbc34",
 			"type": "link",
 			"size": [3,2],
-			"position": [5,0],
-			"pageIndex": 0
+			"pos": [5,0],
+			"data": {
+				"url": "http://www.yahoo.com",
+				"imageURL": "http://www.yahoo.com/image.png"
+			},
+			"pageId": 0
 		},
 		{
 			"id": "ga5fbc34",
 			"type": "group",
-			"items": ["ac4edfc2"]
+			"data": ["ac4edfc2"]
 		}
 	]
 }

@@ -10,19 +10,15 @@ define(["jquery"], function ($) {
             dy: 0
         };
 
-        this.pos   = $.extend({}, this.$el.data('pos'));
-        this.size  = this.$el.data('size');
-
         $el = null;
 
-        this.__DD.cachedPos = $.extend({}, this.pos);
-        this.__DD.dim = this.layout.getCellsDimention(this.size);
+        this.__DD.cachedPos = $.extend({}, this.data.pos);
+        this.__DD.dim = this.layout.getCellsDimention(this.data.size);
 
         this.$el.css('z-index', 100);
-        this.$el.removeData('pos');
 
         // release a place that it takes on a surface
-        this.page.surface.release(this.pos.coll, this.pos.row, this.size.coll, this.size.row);
+        this.page.surface.release(this.data.pos.coll, this.data.pos.row, this.data.size.coll, this.data.size.row);
         
         var cursor  = this.layout.cursor;
         var padding = this.layout.padding;
@@ -39,21 +35,23 @@ define(["jquery"], function ($) {
     function DD_onDragend (e) {
         // console.log("dragend");
 
-        var pos = this.layout.getCellCoordsByPos(this.pos.coll, this.pos.row);
+        var pos = this.layout.getCellCoordsByPos(this.data.pos.coll, this.data.pos.row);
         this.$el.get(0).style.top  = pos.top   + "px";
         this.$el.get(0).style.left = pos.left  + "px";
 
-        this.page.surface.hold(this.pos.coll, this.pos.row, this.size.coll, this.size.row);
+        this.page.surface.hold(this.data.pos.coll, this.data.pos.row, this.data.size.coll, this.data.size.row);
 
         unsetPlaceholder.call(this);
 
-        this.$el.data('pos', this.pos);
+        // this.$el.data('pos', this.pos);
         this.$el.css('z-index', '');
 
         document.removeEventListener("mouseup", this.__DD.evt_OnDragend, false);
         this.page.$el.get(0).removeEventListener("mousemove", this.__DD.evt_OnMousemove, false);
 
         delete this.__DD;
+
+        this.layout.trigger('onItemDrop', this);
     }
 
     function DD_onMousemove (e) {
@@ -82,13 +80,13 @@ define(["jquery"], function ($) {
             var testResult = this.page.surface.testPos(
                 newPos.coll,
                 newPos.row, 
-                this.size.coll,
-                this.size.row
+                this.data.size.coll,
+                this.data.size.row
             );
 
             if (testResult === 0) {
-                this.pos.coll  = newPos.coll;
-                this.pos.row   = newPos.row;
+                this.data.pos.coll  = newPos.coll;
+                this.data.pos.row   = newPos.row;
                 setPlaceholder.call(this);
             }
         }
@@ -127,8 +125,8 @@ define(["jquery"], function ($) {
             this.page.$el.append(this.$ph);
         }
 
-        var coords  = this.layout.getCellCoordsByPos(this.pos);
-        var dim     = this.layout.getCellsDimention(this.size);
+        var coords  = this.layout.getCellCoordsByPos(this.data.pos);
+        var dim     = this.layout.getCellsDimention(this.data.size);
 
         this.$ph.css({
             'top': coords.top + 'px',
@@ -146,14 +144,9 @@ define(["jquery"], function ($) {
     }
 
     return {
-        pos : null,
-        size : null,
-
-        isDraggable: false,
-
-        setAsDraggable: function() {
-            if (this.isDraggable) { return; }
-            this.isDraggable = true;
+        initDraggable: function() {
+            if (!this.data.draggable) { return; }
+            
             this.$el.get(0).addEventListener("dragstart", onDragstart.bind(this), true);
         }
     };

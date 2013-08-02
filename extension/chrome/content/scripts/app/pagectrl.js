@@ -12,109 +12,78 @@ define(
 		"app/events"
 	], 
 
-
 function (Page, helper, Events) {
-	"use strict";
+	'use strict';
+
+	function animatedPageSwitch (id) {
+		// hide current page
+		this.pages[this.layout.selectedPage].hide(function() {
+		// switch a current page index to 'num' 
+			this.layout.selectedPage = id;
+			// show a page with 'num' index
+			this.pages[id].show();
+		}.bind(this));
+	}
 
 	// Page controller is managing the pages
 	var PageCtrl = function (layout) {
 		this.layout = layout;
-		this.pages = [];
-		this.currentIdx = 0;
+		this.pages = {};
 
-		this.pages.push(new Page(layout, this));
+		var pageId = this.layout.selectedPage;
+		this.pages[pageId] = new Page(this, pageId);
 
-		if (this.pages[this.currentIdx]) { this.pages[this.currentIdx].show(); }
+		// ask a group data from the storage
+		this.layout.trigger('onPageData', pageId, function(pageData) {
+			this.pages[this.layout.selectedPage].load(pageData);
+			this.pages[this.layout.selectedPage].show(true);
+		}.bind(this));
 	};
 
 	PageCtrl.prototype = {
-		// sets a current page
-		// gets a current page
-		current: function (num) {
-			// 'num' cannot be negative
-			if (num !== undefined) {
-				num = Math.abs(num);
-			}
-				
-			// if 'num' is not specified a current page will be return
-			if (num === undefined && this.currentIdx !== -1) {
-				return this.pages[this.currentIdx];
-			}
-			
-			if (num !== undefined && this.currentIdx !== -1 && this.currentIdx !== num) {
-				console.log("from: %s to: %s", this.currentIdx, num);
-				
-				// hide current page
-				this.pages[this.currentIdx].hide(function() {
-				// switch a current page index to 'num' 
-					this.currentIdx = num;
-					// show a page with 'num' index
-					this.pages[this.currentIdx].show();
-				}.bind(this));
-							
-				return this.pages[this.currentIdx];
-			}
-
-			if (this.currentIdx === -1 && num !== undefined) {
-					this.currentIdx = num;
-					// show a page with 'num' index
-					this.pages[this.currentIdx].show();				
-			} 
-		},
-		// shows a last page
-		last: function () {
-			return this.current(this.pages.length - 1);
-		},
-			
-		// shows a first page
-		first: function () {
-			return this.current(0);
-		},
-
 		resize: function () {
-			this.pages.forEach(function (page, pageIdx) {
-				if (this.currentIdx === pageIdx) {
-					page.resize();
+			for (var id in this.pages) {
+				if (id === this.layout.selectedPage) { 
+					this.pages[id].resize();
 				}
 				else {
-					page.hasResized = false;
+					this.pages[id].hasResized = false;
 				}
-			}.bind(this));
+			}
 		},
 
 		contentSize: function () {
 			var size = {"width": 0, "height": 0};
 
-			this.pages.forEach(function (page) {
-				var pageGrid = page.surface.contentSize();
+			for (var id in this.pages) {
+				var pageGrid = this.pages[id].surface.contentSize();
 
-				size.width  = (pageGrid.width  - size.width)  > 0 ? pageGrid.width  : size.width;
-				size.height = (pageGrid.height - size.height) > 0 ? pageGrid.height : size.height;
+				size.width  = pageGrid.width  > size.width ? pageGrid.width  : size.width;
+				size.height = pageGrid.height > size.height ? pageGrid.height : size.height;
 
 				pageGrid = null;
-			});
+			}
 
 			return size;
 		},
 
-		// adds a section into a page
-		// {section.address} - by a section address page controller knows 
-		// on which page it should be drawn
-		add: function (section) {
-			// 1. calculate the size of the section.
-			// 2. find a certain size on the page for the section
-			// |o|o|o|x|o|o|o|o|o|o|o|o|
-			// |x|x|o|o|o|o|x|x|x|o|o|o|
-			// |x|x|o|o|o|o|x|x|x|o|o|o|
-			// |o|o|o|o|o|o|x|x|x|o|o|o|
-			// |o|o|o|o|o|o|o|o|o|o|o|o|
-			// |o|o|o|o|o|o|o|o|o|o|o|o|
-			// |o|o|o|o|o|o|o|o|o|o|o|o|
-			// |o|o|o|o|o|o|o|o|o|o|o|o|
-
-			// |x|x|x|
-			// |x|x|x|
-		} 
+		show: function(id, group) {
+			// if (this.layout.selectedPage == id) { return; }
+			if (typeof this.pages[id] === 'undefined') {
+				this.pages[id] = new Page(this, id, group);
+				// ask a group data from 
+				this.layout.trigger('onPageData', id, function(pageData) {
+					if (!pageData) { return; }
+					
+					this.pages[id].load(pageData);
+					animatedPageSwitch.call(this, id);
+				}.bind(this));
+			}
+			else {
+				animatedPageSwitch.call(this, id);
+			}
+			this.layout.trigger('onPageChanged', id);
+		}
 	};
 
 	PageCtrl.prototype = $.extend(PageCtrl.prototype, Events);

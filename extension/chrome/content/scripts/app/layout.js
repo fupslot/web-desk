@@ -59,11 +59,7 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 			"mousemove": function (e) { layoutOnMouseMoveEvent.call(this, e); }.bind(this)
 		});
 
-
 		this.calculate();
-		
-	
-		this.pctrl = new PageCtrl(this);
 	};
 
 	// returns a cell size including its margin
@@ -77,7 +73,7 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 	};
 	// ===========================
 
-	var Layout = function(el) {
+	var Layout = function(el, prop) {
 		this.$el = el;
 
 		this.cursor = {x:0, y:0};
@@ -90,10 +86,17 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 		this.inner = {"width":0, "height":0};
 		this.size  = {"width":0, "height":0};
 
+		// prpblems with number type
+		this.selectedPage = prop.selectedPage || '0';
+
 		layoutInit.call(this);
 	};
 
 	Layout.prototype = {
+		load: function() {
+			this.pctrl = new PageCtrl(this);
+		},
+
 		calculate: function () {
 			var clp = config.layoutPadding;
 			// the layout size should always fit its parent element
