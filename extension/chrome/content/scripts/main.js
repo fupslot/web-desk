@@ -33,12 +33,13 @@ require(
 	'app/config',
 	'app/layout',
 	'app/Events',
+	'app/bin',
 	'app/chrome/services',
 	'components/NewItem',
 	'components/Jumper'
 ],
 
-function ($, helper, config, Layout, Events, Services, NewItem, Jumper) {
+function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 	window.layout = null;
 
 	window.newItem = new NewItem('#new-item');

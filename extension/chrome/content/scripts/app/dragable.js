@@ -1,4 +1,4 @@
-define(["jquery"], function ($) {
+define(["jquery", "app/bin"], function ($, Bin) {
     
     function onDragstart (e) {
         e.preventDefault();
@@ -7,7 +7,8 @@ define(["jquery"], function ($) {
             evt_OnDragend:      DD_onDragend.bind(this),
             evt_OnMousemove:    DD_onMousemove.bind(this),
             dx: 0, 
-            dy: 0
+            dy: 0,
+            bin: null
         };
 
         $el = null;
@@ -30,6 +31,9 @@ define(["jquery"], function ($) {
 
         this.page.$el.get(0).addEventListener("mousemove", this.__DD.evt_OnMousemove, false);
         document.addEventListener("mouseup", this.__DD.evt_OnDragend, false);
+
+        // show the Bin
+        Bin.show();
     }
 
     function DD_onDragend (e) {
@@ -46,15 +50,20 @@ define(["jquery"], function ($) {
         // this.$el.data('pos', this.pos);
         this.$el.css('z-index', '');
 
+        console.log('droped with bin status: ', this.__DD.bin);
+
         document.removeEventListener("mouseup", this.__DD.evt_OnDragend, false);
         this.page.$el.get(0).removeEventListener("mousemove", this.__DD.evt_OnMousemove, false);
 
         delete this.__DD;
 
         this.layout.trigger('onItemDrop', this);
+        // hide the bin
+        Bin.hide();
     }
 
     function DD_onMousemove (e) {
+
         var cursor  = this.layout.cursor;
 
         var coords = glideIt.call(
@@ -65,6 +74,18 @@ define(["jquery"], function ($) {
             this.__DD.dim.height 
         );
 
+        // Bin
+        var binStatus = Bin.status(cursor);
+        if (typeof binStatus !== 'undefined') {
+            this.__DD.bin = binStatus;
+
+            if (binStatus == 'enter') {
+                this.$el.css('opacity', 0.5);
+            }
+            else {
+                this.$el.css('opacity', '');
+            }
+        }
 
         this.$el.get(0).style.top  = coords.y + "px";
         this.$el.get(0).style.left = coords.x + "px";

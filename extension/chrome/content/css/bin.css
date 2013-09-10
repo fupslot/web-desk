@@ -1,0 +1,17 @@
+#bin {
+    position: fixed;
+    transition: bottom 300ms;
+    right: 30px;
+    bottom: -65px;
+    width: 64px;
+    height: 64px;
+    /*background-color: gray;*/
+    /*z-index: 1100;*/
+    background-image: url(../images/recycle_bin.png);
+    background-size: 64px 64px;
+    background-repeat: no-repeat;
+}
+
+#bin.show {
+    bottom: 25px;
+}
