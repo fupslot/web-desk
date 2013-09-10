@@ -34,7 +34,7 @@ function (Page, helper, Events) {
 		this.pages[pageId] = new Page(this, pageId);
 
 		// ask a group data from the storage
-		this.layout.trigger('onPageData', pageId, function(pageData) {
+		this.layout.trigger('onPageData', this.pages[pageId], function(pageData) {
 			this.pages[this.layout.selectedPage].load(pageData);
 			this.pages[this.layout.selectedPage].show(true);
 		}.bind(this));
@@ -68,7 +68,7 @@ function (Page, helper, Events) {
 		},
 
 		show: function(id, group) {
-			// if (this.layout.selectedPage == id) { return; }
+			if (this.layout.selectedPage == id) { return; }
 			if (typeof this.pages[id] === 'undefined') {
 				this.pages[id] = new Page(this, id, group);
 				// ask a group data from 

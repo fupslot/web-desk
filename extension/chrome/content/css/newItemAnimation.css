@@ -1,0 +1,65 @@
+.animated.quick {
+    -webkit-animation-duration: 300ms;
+    -moz-animation-duration: 300ms;
+    animation-duration: 300ms;
+}
+
+@-webkit-keyframes popIn {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(.3);
+    }
+    
+    100% {
+        opacity: 1;
+        -webkit-transform: scale(1);
+    }
+}
+
+@-moz-keyframes popIn {
+    0% {
+        opacity: 0;
+        -moz-transform: scale(.3);
+    }
+    
+    100% {
+        opacity: 1;
+        -moz-transform: scale(1);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        opacity: 0;
+        transform: scale(.3);
+    }
+    
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.popIn {
+    -webkit-animation-name: popIn;
+    -moz-animation-name: popIn;
+    animation-name: popIn;
+}
+
+@-webkit-keyframes popOut {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale(.9);
+    }
+    
+    100% {
+        opacity: 0;
+        -webkit-transform: scale(.3);
+    }
+}
+
+.popOut {
+    -webkit-animation-name: popOut;
+    -moz-animation-name: popOut;
+    animation-name: popOut;
+}

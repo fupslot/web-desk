@@ -16,7 +16,11 @@ function ($, Mustache, helper) {
     return {
         initPageable: function(HTMLtemplate, data) {
             var DEF_SIZE = {coll: 3, row: 2};
-            
+// debugger            
+            if (!this.data.pageId) {
+                this.data.pageId = this.page.id;
+            }
+
             if (typeof this.data.id === 'undefined') {
                 this.data.id = helper.genNewID();
             }

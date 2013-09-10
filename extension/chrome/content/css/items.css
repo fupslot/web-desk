@@ -1,8 +1,6 @@
-.layout .page .item {
-	background-color: #e6e;
-
-	-webkit-box-shadow: 2px 2px 3px rgba(0,0,0,.7);
-	box-shadow: 2px 2px 3px rgba(0,0,0,.7);
+.layout .page .link {
+	-webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
+	box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
 
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -14,5 +12,20 @@
 	z-index: 10;
 
 	cursor: pointer;
+	background-color: white;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	border: 4px solid transparent;
+	box-sizing: border-box;
 }
 
+.layout .page .link.loading {
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	background-size: auto !important;
+	background-image: url(../images/image-loader.gif);
+}
+.layout .page .link.broken {
+	background-image: url(../images/broken-image.gif);
+}

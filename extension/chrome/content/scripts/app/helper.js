@@ -1,4 +1,5 @@
 define(function () {
+	var appInfo = chrome.app.getDetails();
 	// ==============================================
 	// = CALCULATES AN OFFSET FOR THE GIVEN ELEMENT =
 	// ==============================================
@@ -44,6 +45,10 @@ define(function () {
 		"offset": offset,
 		"genNewID": genNewID,
 		"once": once,
+
+		'getThumbnailUrl': function (fileName) {
+			return 'filesystem:chrome-extension://'+appInfo.id+'/persistent/Thumbnails/' + fileName;
+		},
 		
 		"isArray": function (obj) {
 			return is("Array", obj);

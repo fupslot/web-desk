@@ -1,5 +1,5 @@
 /*!
- * Link Class
+ * Group Class
  * Copyright 2013 Fupslot
  * Released under the MIT license
  */
@@ -51,17 +51,17 @@ function ($, Events, Pageable, Dragable, t_link) {
             }
         }
     */
-    function Link(page, data, silent) {
+    function Group(page, data, silent) {
         this.page   = page;
         this.layout = page.layout;
         this.data = data || {};
 
         if (!this.data.type) {
-            this.data.type = 'link';
+            this.data.type = 'group';
         }
 
         if (!this.data.data) {
-            this.data.data = {};
+            this.data.data = [];
         }
 
         // Inherited from Pageable Class
@@ -76,40 +76,18 @@ function ($, Events, Pageable, Dragable, t_link) {
 
 
         this.$el.on('click', function(e) {
-            if (e.which != 1 && e.which != 2) { return false; }
-
-            var win = bgTab = tab = false;
-
-            win     = e.which === 1 && e.shiftKey;
-            bgTab   = e.which === 2 && !e.shiftKey;
-            tab     = e.which === 2 && e.shiftKey;
-
-            if (win) {
-                chrome.windows.create({url: this.data.url});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-            else if(bgTab) {
-                chrome.tabs.create({url: this.data.url, selected: false});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-            else if(tab) {
-                chrome.tabs.create({url: this.data.url, selected: true});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-            else {
-                chrome.tabs.update({url: this.data.url});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-
+            console.log(this.data);
+            this.layout.pctrl.show(this.data.id);
+            this.layout.trigger('onItemClicked', this);
             return true;
         }.bind(this));
     }
 
 
-    Link.prototype = $.extend(Link.prototype, Pageable);
-    Link.prototype = $.extend(Link.prototype, Dragable);
-    Link.prototype = $.extend(Link.prototype, Events);
+    Group.prototype = $.extend(Group.prototype, Pageable);
+    Group.prototype = $.extend(Group.prototype, Dragable);
+    Group.prototype = $.extend(Group.prototype, Events);
 
 
-    return Link;
+    return Group;
 });

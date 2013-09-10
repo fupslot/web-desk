@@ -1,0 +1,89 @@
+[role=modal-dialog] {
+    position: absolute;
+    display: none;
+    opacity: 0;
+    z-index: 200;
+    background-color: rgba(0, 0, 0, 0.34902);
+    padding: 6px 14px;
+    border-radius: 10px;
+    color: #bababa;
+    font-family: Arial;
+    font-size: 1em;
+    line-height: 1.5em;
+    overflow: hidden;
+}
+
+[role=modal-dialog] [role=line] {
+    width: 100%;
+    height: 0px;
+    border-top: 1px solid #898b8d;
+    border-bottom: 1px solid #b6b7b8;
+    margin: 5px 0px 10px 0px;
+}
+
+[role=modal-dialog] ul[role=menu-vertical] {
+    list-style-type: none;
+    margin: 4px 0px;
+    padding: 0px;
+    /*overflow: hidden;*/
+}
+
+.centralized {
+    text-align: center;
+}
+
+[role=modal-dialog] ul[role=menu-vertical] li.selected {
+    background-color: black;
+    padding: 0px 10px;
+    border-radius: 12px;
+}
+
+[role=modal-dialog] ul[role=menu-vertical] li {
+    display: inline-block;
+    padding: 0px 10px;
+    cursor: pointer;
+    line-height: 1.5em;
+}
+
+[role=modal-dialog] ul[role=menu-icons] {
+    list-style-type: none;
+    margin: 4px 0px;
+    padding: 0px;
+    overflow: hidden;
+}
+
+[role=modal-dialog] ul[role=menu-icons] li {
+    display: inline-block;
+    padding: 3px;
+    margin: 0px 10px;
+    width: 122px;
+    height: 74px;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 6px;
+}
+
+[role=modal-dialog] input {
+    line-height: 1.2em;
+    font-size: 1em;
+    border: 0px;    
+    outline: 0;
+}
+
+[role=modal-dialog] input.menu-search {
+    padding: 2px 5px;
+    margin: 0;
+    border-radius: 6px;
+}
+
+.cleared {
+    clear: both;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}

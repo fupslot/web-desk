@@ -26,7 +26,7 @@ define(["jquery"], function ($) {
         this.__DD.dx = cursor.x - parseInt(this.$el.get(0).style.left);
         this.__DD.dy = cursor.y - parseInt(this.$el.get(0).style.top);
 
-        setPlaceholder.call(this);
+        // setPlaceholder.call(this);
 
         this.page.$el.get(0).addEventListener("mousemove", this.__DD.evt_OnMousemove, false);
         document.addEventListener("mouseup", this.__DD.evt_OnDragend, false);
@@ -41,7 +41,7 @@ define(["jquery"], function ($) {
 
         this.page.surface.hold(this.data.pos.coll, this.data.pos.row, this.data.size.coll, this.data.size.row);
 
-        unsetPlaceholder.call(this);
+        // unsetPlaceholder.call(this);
 
         // this.$el.data('pos', this.pos);
         this.$el.css('z-index', '');
@@ -87,7 +87,7 @@ define(["jquery"], function ($) {
             if (testResult === 0) {
                 this.data.pos.coll  = newPos.coll;
                 this.data.pos.row   = newPos.row;
-                setPlaceholder.call(this);
+                // setPlaceholder.call(this);
             }
         }
     }

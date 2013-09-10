@@ -9,5 +9,58 @@
 	</head>
 	<body>
 		<div class="layout"></div>
+		<form action="" style="position:fixed;top:0;right:0;">
+			Url: <input type="text" name="url">
+			Title: <input type="text" name="title">
+			Image: <input type="text" name="image">
+			<input type="checkbox">
+			<input type="submit" value="Submit">
+		</form>
+
+		<div id="jumper" role="modal-dialog">
+			<div class="clear">
+				<ul role="menu-vertical" class="left">
+					<li class="selected">Groups</li>
+					<li>Links</li>
+				</ul>
+				<ul role="menu-vertical" class="right">
+					<li class="non-selectable">
+						<input type="text" name="search" class="menu-search">
+					</li>
+				</ul>
+			</div>
+
+			<hr role="line">
+			<div class="content"></div>
+		</div>
+
+		<div id="new-item" role="modal-dialog">
+			<div class="centralized">
+				<ul role="menu-vertical">
+					<li class="selected">Link</li>
+					<li>Group</li>
+					<li>Gallery</li>
+				</ul>
+			</div>
+			<hr role="line">
+			<div role="close">X</div>
+			<form action="">
+				<div class="url-panel">
+					<input type="text" name="url">
+					<input type="submit" name="fetch" value="(0)">
+				</div>
+					
+				<div class="option-panel">
+					<input type="text" name="title">
+					<div>
+						<span role="scroll-left" disabled="disabled">&lt;</span>
+						<img alt="Image" class="animated">
+						<span role="scroll-right">&gt;</span>
+					</div>
+				</div>
+			</form>
+		</div>
+
+
 	</body>
 </html> 

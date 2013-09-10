@@ -1,0 +1,94 @@
+#new-item {
+    height: 198px;
+}
+
+#new-item div[role=close] {
+    background-color: black;
+    border: 3px solid white;
+    color: white;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 3px 7px;
+    border-radius: 16px;
+    font-size: 0.9em;
+    font-family: Arial;
+    /*box-shadow: 1px 1px 10px rgba(0,0,0,0.5);*/
+    cursor: pointer;
+}
+
+#new-item .url-panel {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.6);
+    
+}
+
+#new-item .url-panel input {
+    line-height: 1.5em;
+    font-size: 1em;
+    border: 0px;    
+    outline: 0;
+}
+
+#new-item .url-panel input[name=url] {
+    padding: 2px 3px;
+    margin: 2px 0px 2px 12px;
+    width: 400px;
+}
+
+#new-item .url-panel input[name=fetch] {
+    margin: 2px 16px 2px 0px;
+    border-radius: 15px;
+    background-color: transparent;
+}
+
+#new-item input[name=url][readonly] {
+    color: gray;
+}
+
+#new-item img:not(src) {
+    background-color: gray;
+}
+#new-item div.url-panel {
+    width: 100%;
+}
+
+#new-item div.option-panel {
+    display: none;
+    height: 0px;
+    overflow: hidden;
+    text-align: center;
+}
+
+#new-item div.option-panel input[name=title]{
+    line-height: 1.5em;
+    font-size: 1em;
+    margin: 20px 0px 11px 0px;
+    padding: 5px 10px 4px 10px;
+    width: 420px;
+    border-radius: 16px;
+    border: 0px;
+    outline: 0;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.6);
+}
+
+#new-item img {
+    border-radius: 5px;
+    border: 5px solid white;
+    box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+    width:160px;
+    height:80px;
+    vertical-align: middle;
+}
+
+#new-item span[role*=scroll] {
+    cursor: pointer;
+    font-size: 1.5em;
+    vertical-align: middle;
+    margin: 6px;
+    /*-webkit-transition: all 500ms;*/
+}
+#new-item span[role*=scroll][disabled] {
+    visibility: hidden;
+}

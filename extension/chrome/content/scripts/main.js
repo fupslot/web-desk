@@ -20,6 +20,7 @@ require.config({
 		"mustache": "mustache/mustache",
 		"text": "requirejs-text/text",
 		"app": "../app",
+		"components": "../components",
 		"data": "../app/data",
 		"template": "../template"
 	}
@@ -27,16 +28,51 @@ require.config({
 
 require(
 [
-	"jquery",
-	"app/helper",
-	"app/config",
-	"app/layout",
-	"app/Events",
-	'app/chrome/services'
+	'jquery',
+	'app/helper',
+	'app/config',
+	'app/layout',
+	'app/Events',
+	'app/chrome/services',
+	'components/NewItem',
+	'components/Jumper'
 ],
 
-function ($, helper, config, Layout, Events, Services) {
+function ($, helper, config, Layout, Events, Services, NewItem, Jumper) {
 	window.layout = null;
+
+	window.newItem = new NewItem('#new-item');
+
+	$('body > form').on('submit', function(e){
+		e.preventDefault();
+		
+		var ct = e.currentTarget;
+// debugger;
+		var 
+			url 		= ct.querySelector('[name=url]').value,
+			title 		= ct.querySelector('[name=title]').value,
+			imageURL 	= ct.querySelector('[name=image]').value,
+			isGroup 	= ct.querySelector('[type=checkbox]').value;
+
+		if (!isGroup) {
+			layout.pctrl.pages[layout.selectedPage].createLink({
+				data: {
+					url: url,
+					title: title,
+					imageURL: imageURL
+				}
+			});
+		}
+		else {
+			layout.pctrl.pages[layout.selectedPage].createGroup({
+				data: {
+					title: title,
+					imageURL: imageURL
+				}
+			});	
+		}
+	});
+
 
 	// ==========================
 	// = ON WINDOW RESIZE EVENT =
@@ -59,16 +95,27 @@ function ($, helper, config, Layout, Events, Services) {
 		});
 	}
 
-	function onLinkCreated(page, link) {
+	function onItemClicked(item) {
 		Services('storage', function(storage) {
-			console.log(link.data);
-			storage.addItem(link.data);
+			storage.touchItem(item);
 		});
 	}
 
-	function onPageData(pageId, callback) {
+	function onItemCreated(page, item) {
 		Services('storage', function(storage) {
-			callback(storage.getItems({type:'link', pageId:pageId}));
+			storage.addItem(item.data);
+		});
+	}
+
+	function onPageData(page, callback) {
+		Services('storage', function(storage) {
+			callback(storage.getItems({pageId:page.id}));
+		});
+	}
+
+	function onItemRemoved (page, item, canceled) {
+		Services('storage', function(storage) {
+			storage.removeItem(item.data);
 		});
 	}
 	
@@ -78,10 +125,25 @@ function ($, helper, config, Layout, Events, Services) {
 		});
 
 		layout.on('onItemDrop', onItemDrop);
+		layout.on('onItemClicked', onItemClicked);
 		layout.on('onPageData', onPageData);
-		layout.on('onLinkCreated', onLinkCreated);
+		layout.on('onLinkCreated', onItemCreated);
+		layout.on('onGroupCreated', onItemCreated);
 		layout.on('onPageChanged', onPageChanged);
+		layout.on('onLinkRemoved', onItemRemoved);
+		layout.on('onGroupRemoved', onItemRemoved);
 		
 		layout.load();
+
+		window.jumper = new Jumper(layout, '#jumper');
+
+		window.jumper.on('onSearchRequest', function(value, keyCode) {
+			// console.log(value);
+			Services('storage', function(storage) {
+				var list = storage.getItems(value, true);
+				jumper.showItems(list);
+				console.log(list);
+			});
+		});
 	});
 });
