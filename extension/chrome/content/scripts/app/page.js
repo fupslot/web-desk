@@ -171,37 +171,57 @@ function ($, config, Surface, Events, Link, Group) {
 			if (!silent) { this.layout.trigger('onLinkCreated', /*page*/this, link); }
 		},
 
-		removeLink: function(link) {
-			for (var i = this.links.length - 1; i >= 0; i--) {
-                if (this.links[i] === link) {
-                	var canceled = {value: false};
- 
-                	this.layout.trigger('onLinkRemoved', this, link, canceled);
+		removeItem: function(item) {
+			var map	 = {'link': 'links', 'group': 'groups'},
+				type = map[item.data.type];
 
-                	if (!canceled.value) {
-	                	this.links[i].$el.remove();
-	                	this.links.splice(i, 1);
-                	}
-                    break;
+			for (var i = this[type].length - 1; i >= 0; i--) {
+				if (this[type][i] === item) {
+					var canceled = {value: false};
+ 
+					this.layout.trigger('onItemRemoved', this, item, canceled);
+
+					if (canceled.value === false) {
+						this[type][i].$el.remove();
+						this[type].splice(i, 1);
+					}
+					break;
                 }
-            }
+			}
+
 		},
 
-		removeGroup: function(group) {
-			for (var i = this.groups.length - 1; i >= 0; i--) {
-                if (this.groups[i] === group) {
-                	var canceled = {value: false};
+		// removeLink: function(link) {
+		// 	for (var i = this.links.length - 1; i >= 0; i--) {
+  //               if (this.links[i] === link) {
+  //               	var canceled = {value: false};
  
-                	this.layout.trigger('onGroupRemoved', this, group, canceled);
+  //               	this.layout.trigger('onLinkRemoved', this, link, canceled);
 
-                	if (!canceled.value) {
-	                	this.groups[i].$el.remove();
-	                	this.groups.splice(i, 1);
-                	}
-                    break;
-                }
-            }
-		},
+  //               	if (!canceled.value) {
+	 //                	this.links[i].$el.remove();
+	 //                	this.links.splice(i, 1);
+  //               	}
+  //                   break;
+  //               }
+  //           }
+		// },
+
+		// removeGroup: function(group) {
+		// 	for (var i = this.groups.length - 1; i >= 0; i--) {
+  //               if (this.groups[i] === group) {
+  //               	var canceled = {value: false};
+ 
+  //               	this.layout.trigger('onGroupRemoved', this, group, canceled);
+
+  //               	if (!canceled.value) {
+	 //                	this.groups[i].$el.remove();
+	 //                	this.groups.splice(i, 1);
+  //               	}
+  //                   break;
+  //               }
+  //           }
+		// },
 
 		createGroup: function(data, silent) {
 			if (!$.isArray(this.groups)) { this.groups = []; }

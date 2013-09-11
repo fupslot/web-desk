@@ -37,8 +37,6 @@ define(["jquery", "app/bin"], function ($, Bin) {
     }
 
     function DD_onDragend (e) {
-        // console.log("dragend");
-
         var pos = this.layout.getCellCoordsByPos(this.data.pos.coll, this.data.pos.row);
         this.$el.get(0).style.top  = pos.top   + "px";
         this.$el.get(0).style.left = pos.left  + "px";
@@ -50,16 +48,20 @@ define(["jquery", "app/bin"], function ($, Bin) {
         // this.$el.data('pos', this.pos);
         this.$el.css('z-index', '');
 
-        console.log('droped with bin status: ', this.__DD.bin);
-
         document.removeEventListener("mouseup", this.__DD.evt_OnDragend, false);
         this.page.$el.get(0).removeEventListener("mousemove", this.__DD.evt_OnMousemove, false);
+
+        var binStatus = this.__DD.bin;
 
         delete this.__DD;
 
         this.layout.trigger('onItemDrop', this);
         // hide the bin
         Bin.hide();
+
+        if (binStatus === 'enter') {
+            this.page.removeItem(this);
+        }
     }
 
     function DD_onMousemove (e) {

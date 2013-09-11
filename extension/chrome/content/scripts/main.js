@@ -131,8 +131,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 		layout.on('onLinkCreated', onItemCreated);
 		layout.on('onGroupCreated', onItemCreated);
 		layout.on('onPageChanged', onPageChanged);
-		layout.on('onLinkRemoved', onItemRemoved);
-		layout.on('onGroupRemoved', onItemRemoved);
+		layout.on('onItemRemoved', onItemRemoved);
 		
 		layout.load();
 
