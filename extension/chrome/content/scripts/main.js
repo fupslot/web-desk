@@ -123,7 +123,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 
 	function onItemRemoved (page, item, canceled) {
 		Services('storage', function(storage) {
-			storage.removeItem(item.data);
+			storage.removeItem(item.data, page.id);
 		});
 	}
 

@@ -113,7 +113,7 @@ function ($, config, Events) {
     function newItem (item) {
         var dim    = this.layout.getCellsDimention(item.size),
             layout = this.layout,
-            draggable = item.pageId != layout.selectedPage;
+            draggable = item.pages.indexOf(layout.selectedPage) == -1;
 
         var $li = $('<li>')
             .attr('draggable', draggable)

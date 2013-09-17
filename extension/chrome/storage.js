@@ -33,7 +33,10 @@
         var items = [];
 
         if (_.isObject(query)) {
-            items = _.where(dataItems, query || {});
+            items = _.filter(dataItems, function (item) {
+                return _.contains(item.pages, query.pageId);
+            });
+            // items = _.where(dataItems, query || {});
         }
 
         if (_.isString(query)) {
@@ -71,12 +74,20 @@
         this.save();
     }
 
-    storage.removeItem = function(item) {
+    storage.removeItem = function(item, pageId) {
         // console.log(item);
         var item = _.findWhere(dataItems, {id: item.id});
-        var index = _.indexOf(dataItems, item);
-        // console.log(index);
-        dataItems.splice(index, 1);
+
+        // remove an items from specified page
+        item.pages.splice(item.pages.indexOf(pageId), 1);
+        
+        // remove an item from storage if it has no references anymore
+        if (item.pages.length == 0) {
+            var index = _.indexOf(dataItems, item);
+            // console.log(index);
+            dataItems.splice(index, 1);
+        }
+
         this.save();
     }
 

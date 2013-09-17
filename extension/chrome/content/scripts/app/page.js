@@ -34,11 +34,11 @@ function ($, config, Surface, Events, Link, Group) {
 	// };
 	// ==========================
 
-	var Page = function (pageCtrl, id, group) {
+	var Page = function (pageCtrl, id) {
 		this.layout = pageCtrl.layout;
 		this.pctrl = pageCtrl;
 		this.id = id;
-		this.group = typeof group === 'boolean' ? group : false;
+		// this.group = typeof group === 'boolean' ? group : false;
 		// this.index = this.pctrl.pages.length;
 		this.surface = null;
 
@@ -175,20 +175,23 @@ function ($, config, Surface, Events, Link, Group) {
 			var map	 = {'link': 'links', 'group': 'groups'},
 				type = map[item.data.type];
 
+			var foundItemIdx = null;
 			for (var i = this[type].length - 1; i >= 0; i--) {
 				if (this[type][i] === item) {
-					var canceled = {value: false};
- 
-					this.layout.trigger('onItemRemoved', this, item, canceled);
-
-					if (canceled.value === false) {
-						this[type][i].$el.remove();
-						this[type].splice(i, 1);
-					}
+					foundItemIdx = i;
 					break;
                 }
 			}
+			// if null the end of the story
+			if (foundItemIdx == null) { return; }
 
+			var canceled = {value: false};
+			this.layout.trigger('onItemRemoved', this, item, canceled);
+
+			if (canceled.value === false) {
+				this[type][foundItemIdx].$el.remove();
+				this[type].splice(foundItemIdx, 1);
+			}
 		},
 
 		createGroup: function(data, silent) {

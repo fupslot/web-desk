@@ -14,11 +14,15 @@ define(
 
 function ($, Mustache, helper) {
     return {
-        initPageable: function(HTMLtemplate, data) {
+        initPageable: function(HTMLtemplate) {
             var DEF_SIZE = {coll: 3, row: 2};
 // debugger            
-            if (!this.data.pageId) {
-                this.data.pageId = this.page.id;
+            // if (!this.data.pageId) {
+            //     this.data.pageId = this.page.id;
+            // }
+
+            if (!this.data.pages) {
+                this.data.pages = [this.page.id];
             }
 
             if (typeof this.data.id === 'undefined') {
