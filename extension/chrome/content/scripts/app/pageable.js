@@ -38,16 +38,20 @@ function ($, Mustache, helper) {
             }
             
             if (!this.data.pos) {
-                this.data.pos = this.page.surface.allocate(
-                    this.data.size.coll,
-                    this.data.size.row
-                );
+                // as soon as the item can be placed 
+                // on many places
+                this.data.pos = {};
+                this.data.pos[this.page.id] = 
+                    this.page.surface.allocate(
+                        this.data.size.coll,
+                        this.data.size.row
+                    );
             }
             else {
                 // on item load it will hold a peace of the surface
                 this.page.surface.hold(
-                    this.data.pos.coll,
-                    this.data.pos.row,
+                    this.data.pos[this.page.id].coll,
+                    this.data.pos[this.page.id].row,
                     this.data.size.coll,
                     this.data.size.row
                 );
@@ -60,7 +64,7 @@ function ($, Mustache, helper) {
             }
 
             var coords, dims;
-            coords = this.layout.getCellCoordsByPos(this.data.pos);
+            coords = this.layout.getCellCoordsByPos(this.data.pos[this.page.id]);
             dims   = this.layout.getCellsDimention(this.data.size);
 
             this.$el = $(Mustache.render(HTMLtemplate,

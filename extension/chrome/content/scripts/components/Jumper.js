@@ -8,10 +8,11 @@ define(
 [
     'jquery',
     'app/config',
-    'app/events'
+    'app/events',
+    'app/helper'
 ],
 
-function ($, config, Events) {
+function ($, config, Events, helper) {
 
     var itemsPerPage = 12;
 
@@ -69,18 +70,6 @@ function ($, config, Events) {
         this.$el.find('[role=pagination]').empty();
     }
 
-    function Jumper(layout) {
-        this.layout = layout;
-        this.$el = $('#jumper');
-        this.$el.hide().addClass('animated quick');
-
-        // store jumper state, like a current page and last search results
-        this._cache = {};
-
-        // this.$el.find('[role=menu-vertical] li').on('click', onMenuItemClick.bind(this));
-        init.call(this);
-    }
-
     function loadContent (html) {
         this.initialized = true;
 
@@ -93,8 +82,11 @@ function ($, config, Events) {
         _show.call(this);
     }
 
-    function _show() {
-        this.trigger('onShow');
+    function _show(soft) {
+        if (soft != true) {
+            this.trigger('onShow');
+        }
+
         this.$el.show().removeClass('popOut').addClass('popIn active');
         this.$el.find('[name=search]').focus();
     }
@@ -113,7 +105,8 @@ function ($, config, Events) {
     function newItem (item) {
         var dim    = this.layout.getCellsDimention(item.size),
             layout = this.layout,
-            draggable = item.pages.indexOf(layout.selectedPage) == -1;
+            draggable = item.pages.indexOf(layout.selectedPage) == -1 
+                            && item.id != layout.selectedPage;
 
         var $li = $('<li>')
             .attr('draggable', draggable)
@@ -124,7 +117,6 @@ function ($, config, Events) {
 
         if (draggable) {
             $li.get(0).addEventListener('dragstart', onDragstart.bind(this), true);
-            // $li.get(0).addEventListener('dragend', onDragend.bind(this), true);
         }
 
         // mark item if it's already located on the page
@@ -136,43 +128,157 @@ function ($, config, Events) {
 
     function onDragstart (e) {
         e.preventDefault();
+
+        var idxOffset   = (this._cache.pageidx || 0) * itemsPerPage,
+            idx         = idxOffset + $(e.target).parent().children().index(e.target),
+            item        = $.extend({}, this._cache.items[idx]);
+
+        var page = layout.pctrl.pages[layout.selectedPage];
+        
+        // before drag start check if page has a place 
+        var pos = page.surface.findPos(item.size.coll, item.size.row);
+        if (pos == null) { return; /*no place on the page*/}
+
+        var dim = this.layout.getCellsDimention(item.size);
+
+        var cursor  = this.layout.cursor,
+            $el     = $('<div>')
+                        .addClass('link broken')
+                        .css({top: cursor.y, left: cursor.x})
+                        .attr('style', $(e.target).attr('style'));
+            
+        page.$el.append($el);
+
         this.__DD = {
-            evt_OnDragend: onDragend.bind(this)
+            page: page,
+            originElement: e.currentTarget,
+            $el: $el,
+            
+            evt_OnDragend: onDragend.bind(this),
+            evt_OnMousemove: onMousemove.bind(this),
+            
+            itemIdx: idx,
+            item: item,
+
+            dx: (dim.width / 2), //cursor.x,// - parseInt($el.get(0).style.left),
+            dy: (dim.height / 2), //cursor.y,// - parseInt($el.get(0).style.top),
+
+            pos: pos,
+            dim: dim
         };
 
+        console.log(this.__DD);
+
         document.addEventListener('mouseup', this.__DD.evt_OnDragend, false);
-        
-        console.log('onDragstart');
-        
+        document.addEventListener('mousemove', this.__DD.evt_OnMousemove, false);
+        // hide jumper softly, w/o reset the cache
+        this.hide(true);
     }
 
     function onDragend (e) {
-        console.log(e);
-        if ($(e.target).hasClass('page')) {
-            console.log('page');
+        // make sure that item has been relised on a page
+        this.__DD.$el.remove();
+
+        // element cannot be dragged more than once
+        $(this.__DD.originElement).attr('draggable', false);
+
+        var page = this.__DD.page,
+            item = this.__DD.item,
+            pos  = $.extend({}, this.__DD.pos);
+
+
+        item.pages.push(page.id);
+        item.pos[page.id] = pos;
+
+        // create an item on a page silently
+        if (item.type == 'link') {
+            this.__DD.page.createLink(item, true);
         }
-        //this.layout.$el.get(0);
+        else if (item.type == 'group') {
+            this.__DD.page.createGroup(item, true);
+        }
+
+        // refresh position information for an item
+        this.trigger('onItemPlaced', item, page, pos);
+        
         document.removeEventListener('mouseup', this.__DD.evt_OnDragend, false);
+        document.removeEventListener('mousemove', this.__DD.evt_OnMousemove, false);
+
         delete this.__DD;
+        // show jumper softly, all items will read from the cache
+        this.show(true);
+    }
+
+    function onMousemove (e) {
+        var cursor  = this.layout.cursor;
+
+        var coords = this.layout.stayFit(
+            cursor.x - this.__DD.dx,
+            cursor.y - this.__DD.dy,
+            this.__DD.dim.width,
+            this.__DD.dim.height 
+        );
+// debugger
+        // console.log(coords);
+
+        this.__DD.$el.get(0).style.top  = coords.y + "px";
+        this.__DD.$el.get(0).style.left = coords.x + "px";
+
+            
+        var pos = this.layout.getCellPosByXY(coords.x, coords.y);
+        if (helper.isPosNotEqual(this.__DD.pos, pos)) {
+            // this.__DD.cachedPos.coll    = newPos.coll;
+            // this.__DD.cachedPos.row     = newPos.row;
+            
+            // see if we can place an item here
+            var test = this.__DD.page.surface.testPos(
+                pos.coll,
+                pos.row, 
+                this.__DD.item.size.coll,
+                this.__DD.item.size.row
+            );
+
+            if (test === 0) {
+                this.__DD.pos = $.extend({}, pos);
+        //         this.__DD.pos.row   = newPos.row;
+        //         // setPlaceholder.call(this);
+            }
+        }
+    }
+
+    // Class defenition
+    function Jumper(layout) {
+        this.layout = layout;
+        this.$el = $('#jumper');
+        this.$el.hide().addClass('animated quick');
+
+        // store jumper state, like a current page and last search results
+        this._cache = {};
+
+        // this.$el.find('[role=menu-vertical] li').on('click', onMenuItemClick.bind(this));
+        init.call(this);
     }
 
     Jumper.prototype = {
-        show: function () {
+        show: function (soft) {
             if (!this.initialized) {
                 this.$el.load('scripts/template/jumper.html', loadContent.bind(this));
             }
             else {
-                _show.call(this);
+                _show.call(this, soft);
             }
         },
-
-        hide: function () {
+        // if soft equals true no cache be removed
+        hide: function (soft) {
             this.trigger('onHide');
             this.$el.removeClass('popIn active').addClass('popOut');
             setTimeout(function () {
                 this.$el.hide().removeClass('popOut');
                 this.$el.find('[name=search]').blur();
-                reset.call(this);
+
+                if (soft != true) {
+                    reset.call(this);
+                }
             }.bind(this), 500);
         },
 

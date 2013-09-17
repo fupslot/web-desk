@@ -40,6 +40,10 @@ define(function () {
 			return r.toString(16);
 		});
 	}
+
+	function isPosNotEqual (pos1, pos2) {
+        return pos1.coll !== pos2.coll || pos1.row !== pos2.row;
+    }
 	
 	return {
 		"offset": offset,
@@ -54,12 +58,14 @@ define(function () {
 			return is("Array", obj);
 		},
 
-		"isObject": function (obj) {
+		'isObject': function (obj) {
 			return is("Object", obj);
 		},
 
 		"isArray": function (obj) {
 			return is("Array", obj);
-		}
+		},
+
+		'isPosNotEqual': isPosNotEqual
 	};
 });

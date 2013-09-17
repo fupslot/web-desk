@@ -1,4 +1,4 @@
-define(["jquery", "app/bin"], function ($, Bin) {
+define(["jquery", "app/bin", 'app/helper'], function ($, Bin, helper) {
     
     function onDragstart (e) {
         e.preventDefault();
@@ -15,16 +15,21 @@ define(["jquery", "app/bin"], function ($, Bin) {
 
         $el = null;
 
-        this.__DD.cachedPos = $.extend({}, this.data.pos);
+        this.__DD.cachedPos = $.extend({}, this.data.pos[this.page.id]);
         this.__DD.dim = this.layout.getCellsDimention(this.data.size);
 
         this.$el.css('z-index', 100);
 
         // release a place that it takes on a surface
-        this.page.surface.release(this.data.pos.coll, this.data.pos.row, this.data.size.coll, this.data.size.row);
+        this.page.surface.release(
+            this.data.pos[this.page.id].coll,
+            this.data.pos[this.page.id].row,
+            this.data.size.coll,
+            this.data.size.row
+        );
         
         var cursor  = this.layout.cursor;
-        var padding = this.layout.padding;
+        // var padding = this.layout.padding;
 
         this.__DD.dx = cursor.x - parseInt(this.$el.get(0).style.left);
         this.__DD.dy = cursor.y - parseInt(this.$el.get(0).style.top);
@@ -39,11 +44,19 @@ define(["jquery", "app/bin"], function ($, Bin) {
     }
 
     function DD_onDragend (e) {
-        var pos = this.layout.getCellCoordsByPos(this.data.pos.coll, this.data.pos.row);
+        var pos = this.layout.getCellCoordsByPos(
+            this.data.pos[this.page.id].coll,
+            this.data.pos[this.page.id].row);
+
         this.$el.get(0).style.top  = pos.top   + "px";
         this.$el.get(0).style.left = pos.left  + "px";
 
-        this.page.surface.hold(this.data.pos.coll, this.data.pos.row, this.data.size.coll, this.data.size.row);
+        this.page.surface.hold(
+            this.data.pos[this.page.id].coll,
+            this.data.pos[this.page.id].row,
+            this.data.size.coll,
+            this.data.size.row
+        );
 
         // unsetPlaceholder.call(this);
 
@@ -70,8 +83,7 @@ define(["jquery", "app/bin"], function ($, Bin) {
 
         var cursor  = this.layout.cursor;
 
-        var coords = glideIt.call(
-            this,
+        var coords = this.layout.stayFit(
             cursor.x - this.__DD.dx,
             cursor.y - this.__DD.dy,
             this.__DD.dim.width,
@@ -97,7 +109,7 @@ define(["jquery", "app/bin"], function ($, Bin) {
             
         var newPos = this.layout.getCellPosByXY(coords.x, coords.y);
 
-        if (notEquals(this.__DD.cachedPos, newPos)) {
+        if (helper.isPosNotEqual(this.__DD.cachedPos, newPos)) {
             this.__DD.cachedPos.coll    = newPos.coll;
             this.__DD.cachedPos.row     = newPos.row;
             
@@ -110,63 +122,63 @@ define(["jquery", "app/bin"], function ($, Bin) {
             );
 
             if (testResult === 0) {
-                this.data.pos.coll  = newPos.coll;
-                this.data.pos.row   = newPos.row;
+                this.data.pos[this.page.id].coll  = newPos.coll;
+                this.data.pos[this.page.id].row   = newPos.row;
                 // setPlaceholder.call(this);
             }
         }
     }
 
-    function notEquals (pos1, pos2) {
-        return pos1.coll !== pos2.coll || pos1.row !== pos2.row;
-    }
+    // function notEquals (pos1, pos2) {
+    //     return pos1.coll !== pos2.coll || pos1.row !== pos2.row;
+    // }
 
-    function glideIt (x, y, w, h) {
-        var inner = this.layout.inner;
-        var coords = {x:x, y:y};
+    // function glideIt (x, y, w, h) {
+    //     var inner = this.layout.inner;
+    //     var coords = {x:x, y:y};
 
-        if (x < 0) {
-            coords.x = 0;
-        }
+    //     if (x < 0) {
+    //         coords.x = 0;
+    //     }
 
-        if (y < 0) {
-            coords.y = 0;
-        }
+    //     if (y < 0) {
+    //         coords.y = 0;
+    //     }
 
-        if ( (x + w) > inner.width ) {
-            coords.x = inner.width - w;
-        }
+    //     if ( (x + w) > inner.width ) {
+    //         coords.x = inner.width - w;
+    //     }
 
-        if ( (y + h) > inner.height ) {
-            coords.y = inner.height - h;
-        }
+    //     if ( (y + h) > inner.height ) {
+    //         coords.y = inner.height - h;
+    //     }
 
-        return coords;
-    }
+    //     return coords;
+    // }
 
-    function setPlaceholder() {
-        if ( ! this.$ph) {
-            this.$ph = $("<div>", {"class": "placeholder", });
-            this.page.$el.append(this.$ph);
-        }
+    // function setPlaceholder() {
+    //     if ( ! this.$ph) {
+    //         this.$ph = $("<div>", {"class": "placeholder", });
+    //         this.page.$el.append(this.$ph);
+    //     }
 
-        var coords  = this.layout.getCellCoordsByPos(this.data.pos);
-        var dim     = this.layout.getCellsDimention(this.data.size);
+    //     var coords  = this.layout.getCellCoordsByPos(this.data.pos);
+    //     var dim     = this.layout.getCellsDimention(this.data.size);
 
-        this.$ph.css({
-            'top': coords.top + 'px',
-            'left': coords.left + 'px',
-            'width': dim.width + 'px',
-            'height': dim.height + 'px'
-        });
-    }
+    //     this.$ph.css({
+    //         'top': coords.top + 'px',
+    //         'left': coords.left + 'px',
+    //         'width': dim.width + 'px',
+    //         'height': dim.height + 'px'
+    //     });
+    // }
 
-    function unsetPlaceholder() {
-        if (this.$ph) {
-            this.$ph.remove();
-            this.$ph = null;
-        }
-    }
+    // function unsetPlaceholder() {
+    //     if (this.$ph) {
+    //         this.$ph.remove();
+    //         this.$ph = null;
+    //     }
+    // }
 
     return {
         initDraggable: function() {

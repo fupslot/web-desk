@@ -241,7 +241,27 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 			this.$el.append(html);
 		},
 
-		generate: function (argument) { },
+		stayFit: function (x, y, w, h) {
+	        var coords = {x:x, y:y};
+
+	        if (x < 0) {
+	            coords.x = 0;
+	        }
+
+	        if (y < 0) {
+	            coords.y = 0;
+	        }
+
+	        if ( (x + w) > this.inner.width ) {
+	            coords.x = this.inner.width - w;
+	        }
+
+	        if ( (y + h) > this.inner.height ) {
+	            coords.y = this.inner.height - h;
+	        }
+
+	        return coords;
+	    }
 
 		// destroy: function () { $(window).off("resize.layout"); }
 	};

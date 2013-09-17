@@ -36,11 +36,14 @@
             items = _.filter(dataItems, function (item) {
                 return _.contains(item.pages, query.pageId);
             });
-            // items = _.where(dataItems, query || {});
         }
 
         if (_.isString(query)) {
             items = searchItems(query);
+        }
+
+        if(_.isUndefined(query)) {
+            items = dataItems;
         }
 
         return _.sortBy(items, function(item) {
@@ -58,6 +61,7 @@
         });
     }
 
+    // updates item last access
     storage.touchItem = function(item) {
         var item = _.findWhere(dataItems, {id: item.id});
         if (!_.isEmpty(item)) {
@@ -71,6 +75,17 @@
     */
     storage.addItem = function(item) {
         dataItems.push(item);
+        this.save();
+    }
+
+    storage.updateItemPosition = function(item, page, pos) {
+        var item = _.findWhere(dataItems, {id: item.id});
+        
+        if (_.isEmpty(item)) { return; }
+
+        item.pos[page.id] = pos;
+        item.pages.push(page.id);
+
         this.save();
     }
 

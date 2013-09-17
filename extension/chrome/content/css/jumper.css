@@ -30,6 +30,10 @@
     margin: 8px 14px;
 }
 
+#jumper .link[draggable=false] {
+    border-color: red;
+}
+
 #jumper .link.wide {
     margin-left: 38px;
     margin-right: 38px;

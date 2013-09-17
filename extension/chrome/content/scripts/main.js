@@ -155,10 +155,27 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 
 		window.jumper = new Jumper(layout);
 
-		window.jumper.on('onSearchRequest', function(value, keyCode) {
-			Services('storage', function(storage) {
+		window.jumper.on('onShow', function () {
+			Services('storage', function (storage) {
+				jumper._cache.items = storage.getItems();
+				
+				jumper.showItems();
+			});
+		});
+
+		window.jumper.on('onSearchRequest', function (value, keyCode) {
+			Services('storage', function (storage) {
 				jumper._cache.items = storage.getItems(value);
 				jumper.showItems();
+			});
+		});
+
+		// this event occurs when item was dragged from jumper to a page
+		window.jumper.on('onItemPlaced', function (item, page, pos) {
+			Services('storage', function (storage) {
+				storage.updateItemPosition(item, page, pos);
+				// jumper._cache.items = storage.getItems(value);
+				// jumper.showItems();
 			});
 		});
 	});
