@@ -1,9 +1,3 @@
-.animated.quick {
-    -webkit-animation-duration: 300ms;
-    -moz-animation-duration: 300ms;
-    animation-duration: 300ms;
-}
-
 @-webkit-keyframes popIn {
     0% {
         opacity: 0;

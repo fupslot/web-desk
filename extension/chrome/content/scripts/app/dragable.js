@@ -3,6 +3,8 @@ define(["jquery", "app/bin"], function ($, Bin) {
     function onDragstart (e) {
         e.preventDefault();
 
+        this.layout.trigger('onItemDragStart');
+
         this.__DD = {
             evt_OnDragend:      DD_onDragend.bind(this),
             evt_OnMousemove:    DD_onMousemove.bind(this),

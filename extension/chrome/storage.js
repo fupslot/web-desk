@@ -27,31 +27,32 @@
             options - object
                 {'page': number}  - returns items for a specific page
                 {'group': number} - return items for a specific group
+            query - string
     */
-    storage.getItems = function(query, sortedByLastAccess) {
+    storage.getItems = function(query) {
+        var items = [];
+
         if (_.isObject(query)) {
-            return _.where(dataItems, query || {});
+            items = _.where(dataItems, query || {});
         }
 
-            // debugger
         if (_.isString(query)) {
-
-            var items = _.filter(dataItems, function(item) {
-                var url   = item.data.url   || ''
-                  , title = item.data.title || '';
-
-                return (url.indexOf(query)   !== -1) || 
-                       (title.indexOf(query) !== -1);
-            });
-
-            if (sortedByLastAccess) {
-                items = _.sortBy(items, function(item) {
-                    return item.lastAccess || 0;
-                });
-            }
-
-            return items;
+            items = searchItems(query);
         }
+
+        return _.sortBy(items, function(item) {
+            return item.lastAccess || 0;
+        });
+    }
+
+    function searchItems (query) {
+        return _.filter(dataItems, function(item) {
+            var url   = item.data.url   || ''
+              , title = item.data.title || '';
+
+            return (url.indexOf(query)   !== -1) || 
+                   (title.indexOf(query) !== -1);
+        });
     }
 
     storage.touchItem = function(item) {

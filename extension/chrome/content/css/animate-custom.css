@@ -32,6 +32,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	animation-duration: 2s;
 }
 
+.animated.quick {
+    -webkit-animation-duration: 300ms;
+    -moz-animation-duration: 300ms;
+    animation-duration: 300ms;
+}
+
 @-webkit-keyframes flash {
 	0%, 50%, 100% {opacity: 1;}	
 	25%, 75% {opacity: 0;}

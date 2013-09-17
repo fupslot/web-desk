@@ -89,6 +89,13 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 			storage.selectedPage = pageId;
 		});
 	}
+	
+	function onItemDragStart () {
+		// close jumper
+		if (jumper.isShown()) {
+			jumper.hide();
+		}
+	}
 
 	function onItemDrop(item) {
 		Services('storage', function(storage) {
@@ -119,12 +126,22 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 			storage.removeItem(item.data);
 		});
 	}
+
+	function onPageDblClick(page, evt) {
+		if (!jumper.isShown()) {
+			jumper.show();
+		}
+		else {
+			jumper.hide();
+		}
+	}
 	
 	Services('storage', function(storage) {
 		layout = new Layout($("div.layout"), {
 			selectedPage: storage.selectedPage.toString()
 		});
 
+		layout.on('onItemDragStart', onItemDragStart);
 		layout.on('onItemDrop', onItemDrop);
 		layout.on('onItemClicked', onItemClicked);
 		layout.on('onPageData', onPageData);
@@ -132,17 +149,16 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 		layout.on('onGroupCreated', onItemCreated);
 		layout.on('onPageChanged', onPageChanged);
 		layout.on('onItemRemoved', onItemRemoved);
+		layout.on('onPageDblClick', onPageDblClick);
 		
 		layout.load();
 
-		window.jumper = new Jumper(layout, '#jumper');
+		window.jumper = new Jumper(layout);
 
 		window.jumper.on('onSearchRequest', function(value, keyCode) {
-			// console.log(value);
 			Services('storage', function(storage) {
-				var list = storage.getItems(value, true);
-				jumper.showItems(list);
-				console.log(list);
+				jumper._cache.items = storage.getItems(value);
+				jumper.showItems();
 			});
 		});
 	});

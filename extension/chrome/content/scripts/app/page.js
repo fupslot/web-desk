@@ -24,14 +24,14 @@ function ($, config, Surface, Events, Link, Group) {
 	// ==========================
 	var setPageEvents = function() {
 		this.$el.on("dblclick.itemClickEvent", function(e) {
-			pageItemOnClick.call(this, e);
+			this.layout.trigger('onPageDblClick', this, e);
 		}.bind(this));
 	};
 
-	var pageItemOnClick = function(e) {
+	// var pageItemOnClick = function(e) {
 
-		this.createLink({size: {coll:2, row:2}});
-	};
+	// 	this.createLink({size: {coll:2, row:2}});
+	// };
 	// ==========================
 
 	var Page = function (pageCtrl, id, group) {
@@ -190,38 +190,6 @@ function ($, config, Surface, Events, Link, Group) {
 			}
 
 		},
-
-		// removeLink: function(link) {
-		// 	for (var i = this.links.length - 1; i >= 0; i--) {
-  //               if (this.links[i] === link) {
-  //               	var canceled = {value: false};
- 
-  //               	this.layout.trigger('onLinkRemoved', this, link, canceled);
-
-  //               	if (!canceled.value) {
-	 //                	this.links[i].$el.remove();
-	 //                	this.links.splice(i, 1);
-  //               	}
-  //                   break;
-  //               }
-  //           }
-		// },
-
-		// removeGroup: function(group) {
-		// 	for (var i = this.groups.length - 1; i >= 0; i--) {
-  //               if (this.groups[i] === group) {
-  //               	var canceled = {value: false};
- 
-  //               	this.layout.trigger('onGroupRemoved', this, group, canceled);
-
-  //               	if (!canceled.value) {
-	 //                	this.groups[i].$el.remove();
-	 //                	this.groups.splice(i, 1);
-  //               	}
-  //                   break;
-  //               }
-  //           }
-		// },
 
 		createGroup: function(data, silent) {
 			if (!$.isArray(this.groups)) { this.groups = []; }
