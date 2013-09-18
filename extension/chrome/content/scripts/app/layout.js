@@ -91,7 +91,7 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 		this.size  = {"width":0, "height":0};
 
 		// prpblems with number type
-		this.selectedPage = prop.selectedPage || '0';
+		this.selectedPageId = prop.selectedPageId || '0';
 
 		layoutInit.call(this);
 	};
@@ -243,6 +243,20 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 				}
 			}
 			this.$el.append(html);
+		},
+		
+		// returns true if given page is predefined
+		// if no give id it checks selected page
+		isPagePredefined: function (pageId) {
+			if (typeof pageId == 'undefined') {
+				pageId = this.selectedPageId;
+			}
+
+			return (!isNaN(parseInt(pageId)) && [0,1,2].indexOf(parseInt(pageId)) != -1);
+		},
+
+		selectedPage: function () {
+			return this.pctrl.pages[this.selectedPageId];
 		},
 
 		stayFit: function (x, y, w, h) {

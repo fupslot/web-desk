@@ -17,9 +17,9 @@ function (Page, helper, Events) {
 
 	function animatedPageSwitch (id) {
 		// hide current page
-		this.pages[this.layout.selectedPage].hide(function() {
+		this.pages[this.layout.selectedPageId].hide(function() {
 		// switch a current page index to 'num' 
-			this.layout.selectedPage = id;
+			this.layout.selectedPageId = id;
 			// show a page with 'num' index
 			this.pages[id].show();
 		}.bind(this));
@@ -30,20 +30,20 @@ function (Page, helper, Events) {
 		this.layout = layout;
 		this.pages = {};
 
-		var pageId = this.layout.selectedPage;
+		var pageId = this.layout.selectedPageId;
 		this.pages[pageId] = new Page(this, pageId);
 
 		// ask a group data from the storage
-		this.layout.trigger('onPageData', this.pages[pageId], function(pageData) {
-			this.pages[this.layout.selectedPage].load(pageData);
-			this.pages[this.layout.selectedPage].show(true);
+		this.layout.trigger('onPageData', this.pages[pageId], function(items) {
+			this.pages[this.layout.selectedPageId].load(items);
+			this.pages[this.layout.selectedPageId].show(true);
 		}.bind(this));
 	};
 
 	PageCtrl.prototype = {
 		resize: function () {
 			for (var id in this.pages) {
-				if (id === this.layout.selectedPage) { 
+				if (id === this.layout.selectedPageId) { 
 					this.pages[id].resize();
 				}
 				else {
@@ -72,11 +72,11 @@ function (Page, helper, Events) {
 
 			var page = this.pages[id];
 
-			if (this.layout.selectedPage === id) { return; }
+			if (this.layout.selectedPageId === id) { return; }
 			if (typeof page === 'undefined') {
 				page = new Page(this, id, group);
 				this.pages[id] = page;
-				// ask a group data from 
+				// ask a group's data from storage
 				this.layout.trigger('onPageData', page, function(pageData) {
 					if (!pageData) { return; }
 					

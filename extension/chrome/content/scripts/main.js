@@ -64,7 +64,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 			isGroup 	= ct.querySelector('[type=checkbox]').value;
 
 		if (!isGroup) {
-			layout.pctrl.pages[layout.selectedPage].createLink({
+			layout.pctrl.pages[layout.selectedPageId].createLink({
 				data: {
 					url: url,
 					title: title,
@@ -73,7 +73,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 			});
 		}
 		else {
-			layout.pctrl.pages[layout.selectedPage].createGroup({
+			layout.pctrl.pages[layout.selectedPageId].createGroup({
 				data: {
 					title: title,
 					imageURL: imageURL
@@ -99,7 +99,11 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 	// =================
 	function onPageChanged (page) {
 		Services('storage', function(storage) {
-			storage.selectedPage = page.id;
+			storage.selectedPageId = page.id;
+
+			if (!layout.isPagePredefined(page.id)) {
+				sheets.pin(page);
+			}
 		});
 	}
 	
@@ -129,9 +133,15 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 	}
 
 	function onPageData(page, callback) {
-		console.log('onPageData', page);
 		Services('storage', function(storage) {
-			callback(storage.getItems({pageId:page.id}));
+			
+			// if selectedPage is a group than on its first run 
+			// fetch its group object from storage
+			if (!page.group && !page.layout.isPagePredefined(page.id)) {
+				page.group = storage.getItemById(page.id);
+			}
+			
+			callback(storage.getItemsByPageId(page.id));
 		});
 	}
 
@@ -153,7 +163,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 	
 	Services('storage', function(storage) {
 		layout = new Layout($("div.layout"), {
-			selectedPage: storage.selectedPage.toString()
+			selectedPageId: storage.selectedPageId.toString()
 		});
 
 		layout.on('onItemDragStart', onItemDragStart);
@@ -176,7 +186,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 		jumper = new Jumper(layout);
 		jumper.on('onShow', function () {
 			Services('storage', function (storage) {
-				jumper._cache.items = storage.getItems();
+				jumper._cache.items = storage.getAllItems();
 				
 				jumper.showItems();
 			});
@@ -184,7 +194,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 
 		jumper.on('onSearchRequest', function (value, keyCode) {
 			Services('storage', function (storage) {
-				jumper._cache.items = storage.getItems(value);
+				jumper._cache.items = storage.searchItems(value);
 				jumper.showItems();
 			});
 		});
@@ -192,7 +202,6 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 		// this event occurs when item was dragged from jumper to a page
 		jumper.on('onItemPlaced', function (item, page, pos) {
 			Services('storage', function (storage) {
-				// storage.updateItemPosition(item, page, pos);
 				storage.touchItem(item);
 			});
 		});

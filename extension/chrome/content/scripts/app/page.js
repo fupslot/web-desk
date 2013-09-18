@@ -34,10 +34,14 @@ function ($, config, Surface, Events, Link, Group) {
 	// };
 	// ==========================
 
-	var Page = function (pageCtrl, id) {
+	var Page = function (pageCtrl, id, group) {
 		this.layout = pageCtrl.layout;
 		this.pctrl = pageCtrl;
 		this.id = id;
+
+		if (typeof group != 'indefined') {
+			this.group = group;
+		}
 		// this.group = typeof group === 'boolean' ? group : false;
 		// this.index = this.pctrl.pages.length;
 		this.surface = null;
@@ -139,14 +143,14 @@ function ($, config, Surface, Events, Link, Group) {
 		},
 
 		// pageData - array
-		load: function(pageData) {
-			if (!pageData.forEach) { return; }
-			pageData.forEach(function(data){
-				if (data.type === 'link') {
-					this.createLink(data, true); // no animation needed
+		load: function(items) {
+			if (!items.forEach) { return; }
+			items.forEach(function(item){
+				if (item.type === 'link') {
+					this.createLink(item, true); // no animation needed
 				}
-				if (data.type === 'group') {
-					this.createGroup(data, true); // no animation needed
+				if (item.type === 'group') {
+					this.createGroup(item, true); // no animation needed
 				}
 			}.bind(this));
 		},

@@ -13,16 +13,16 @@
         localStorage['items'] = '[]';
     }
 
-    if (_.isUndefined(localStorage['selectedPage'])) {
-        localStorage['selectedPage'] = '0';
+    if (_.isUndefined(localStorage['selectedPageId'])) {
+        localStorage['selectedPageId'] = '0';
     }
 
-    storage.__defineGetter__('selectedPage', function() {
-        return localStorage['selectedPage'];
+    storage.__defineGetter__('selectedPageId', function() {
+        return localStorage['selectedPageId'];
     });
 
-    storage.__defineSetter__('selectedPage', function(num) {
-        localStorage['selectedPage'] = num;
+    storage.__defineSetter__('selectedPageId', function(num) {
+        localStorage['selectedPageId'] = num;
     });
 
     storage.save = function() {
@@ -37,37 +37,72 @@
             query - string
                   - object {pageId: id}
     */
-    storage.getItems = function(query) {
-        var items = [];
 
-        if (_.isObject(query)) {
-            items = _.filter(dataItems, function (item) {
-                return _.contains(item.pages, query.pageId);
-            });
-        }
+    storage.getItemById = function (itemId) {
+        return _.findWhere(dataItems, {id: itemId});
+    }
 
-        if (_.isString(query)) {
-            items = searchItems(query);
-        }
-
-        if(_.isUndefined(query)) {
-            items = dataItems;
-        }
+    storage.getItemsByPageId = function (pageId) {
+        var items = _.filter(dataItems, function (item) {
+            return _.contains(item.pages, pageId);
+        });
 
         return _.sortBy(items, function(item) {
             return item.lastAccess || 0;
         });
     }
 
-    function searchItems (query) {
-        return _.filter(dataItems, function(item) {
+    storage.getAllItems = function () {
+        return _.sortBy(dataItems, function(item) {
+            return item.lastAccess || 0;
+        });
+    }
+
+    storage.searchItems = function (query) {
+        var items = _.filter(dataItems, function(item) {
             var url   = item.data.url   || ''
               , title = item.data.title || '';
 
             return (url.indexOf(query)   !== -1) || 
                    (title.indexOf(query) !== -1);
         });
+
+        return _.sortBy(items, function(item) {
+            return item.lastAccess || 0;
+        });
     }
+
+    // storage.getItems = function(query) {
+    //     var items = [];
+
+    //     if (_.isObject(query)) {
+    //         items = _.filter(dataItems, function (item) {
+    //             return _.contains(item.pages, query.pageId);
+    //         });
+    //     }
+
+    //     if (_.isString(query)) {
+    //         items = searchItems(query);
+    //     }
+
+    //     if(_.isUndefined(query)) {
+    //         items = dataItems;
+    //     }
+
+    //     return _.sortBy(items, function(item) {
+    //         return item.lastAccess || 0;
+    //     });
+    // }
+
+    // function searchItems (query) {
+    //     return _.filter(dataItems, function(item) {
+    //         var url   = item.data.url   || ''
+    //           , title = item.data.title || '';
+
+    //         return (url.indexOf(query)   !== -1) || 
+    //                (title.indexOf(query) !== -1);
+    //     });
+    // }
 
     // updates item last access
     storage.touchItem = function(item) {
@@ -86,16 +121,6 @@
         this.save();
     }
 
-    storage.updateItemPosition = function(item, page, pos) {
-        var item = _.findWhere(dataItems, {id: item.id});
-        
-        if (_.isEmpty(item)) { return; }
-
-        // item.pos[page.id] = pos;
-        // item.pages.push(page.id);
-
-        this.save();
-    }
 
     // force - [boolean] delete item and its links on all pages 
     // not emplemented yet

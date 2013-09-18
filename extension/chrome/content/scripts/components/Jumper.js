@@ -106,10 +106,10 @@ function ($, config, Events, helper) {
         var dim    = this.layout.getCellsDimention(item.size),
             layout = this.layout,
 
-            draggable = item.pages.indexOf(layout.selectedPage) == -1;
+            draggable = item.pages.indexOf(layout.selectedPageId) == -1;
 
         // don't draw item if it's a current page
-        if (item.id == layout.selectedPage) { return; }
+        if (item.id == layout.selectedPageId) { return; }
 
         var $li = $('<li>')
             .attr('draggable', draggable)
@@ -170,7 +170,7 @@ function ($, config, Events, helper) {
         
         this.hide(true);
 
-        this.layout.pctrl.show(item.id);
+        this.layout.pctrl.show(item.id, item);
         this.layout.trigger('onItemClicked', item);
         return true;
     }
@@ -187,7 +187,7 @@ function ($, config, Events, helper) {
         var idx  = getItemIdxByElement.call(this, e.target),
             item = $.extend({}, this._cache.items[idx]);
 
-        var page = layout.pctrl.pages[layout.selectedPage];
+        var page = layout.pctrl.pages[layout.selectedPageId];
         
         // before drag start check if page has a place 
         var pos = page.surface.findPos(item.size.coll, item.size.row);

@@ -77,7 +77,7 @@ function ($, Events, Pageable, Dragable, t_link) {
 
         this.$el.on('click', function(e) {
             console.log(this.data);
-            this.layout.pctrl.show(this.data.id);
+            this.layout.pctrl.show(this.data.id, this.data);
             this.layout.trigger('onItemClicked', this);
             return true;
         }.bind(this));
