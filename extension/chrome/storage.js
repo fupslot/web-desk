@@ -9,6 +9,13 @@
         }
         catch(ex) { throw 'Bad layout data format'; }
     }
+    else {
+        localStorage['items'] = '[]';
+    }
+
+    if (_.isUndefined(localStorage['selectedPage'])) {
+        localStorage['selectedPage'] = '0';
+    }
 
     storage.__defineGetter__('selectedPage', function() {
         return localStorage['selectedPage'];
@@ -28,6 +35,7 @@
                 {'page': number}  - returns items for a specific page
                 {'group': number} - return items for a specific group
             query - string
+                  - object {pageId: id}
     */
     storage.getItems = function(query) {
         var items = [];
@@ -83,25 +91,38 @@
         
         if (_.isEmpty(item)) { return; }
 
-        item.pos[page.id] = pos;
-        item.pages.push(page.id);
+        // item.pos[page.id] = pos;
+        // item.pages.push(page.id);
 
         this.save();
     }
 
-    storage.removeItem = function(item, pageId) {
+    // force - [boolean] delete item and its links on all pages 
+    // not emplemented yet
+    storage.removeItem = function(page, item, force) {
         // console.log(item);
         var item = _.findWhere(dataItems, {id: item.id});
 
         // remove an items from specified page
-        item.pages.splice(item.pages.indexOf(pageId), 1);
+        item.pages.splice(item.pages.indexOf(page.id), 1);
+        delete item.pos[page.id];
+
+        var isGroupEmpty = true;
+        if (item.type == 'group') {
+            var groupItems = this.getItems({pageId: item.id});
+            isGroupEmpty = groupItems.length === 0;
+        }
         
         // remove an item from storage if it has no references anymore
-        if (item.pages.length == 0) {
+        // only empty groups will be deleted
+        if ((item.type == 'link'  && item.pages.length == 0) || 
+            (item.type == 'group' && item.pages.length == 0 && isGroupEmpty == true)) {
             var index = _.indexOf(dataItems, item);
             // console.log(index);
             dataItems.splice(index, 1);
         }
+
+        console.log('storage', [item.pages, item.pos]);
 
         this.save();
     }

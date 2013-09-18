@@ -105,8 +105,11 @@ function ($, config, Events, helper) {
     function newItem (item) {
         var dim    = this.layout.getCellsDimention(item.size),
             layout = this.layout,
-            draggable = item.pages.indexOf(layout.selectedPage) == -1 
-                            && item.id != layout.selectedPage;
+
+            draggable = item.pages.indexOf(layout.selectedPage) == -1;
+
+        // don't draw item if it's a current page
+        if (item.id == layout.selectedPage) { return; }
 
         var $li = $('<li>')
             .attr('draggable', draggable)
@@ -115,23 +118,74 @@ function ($, config, Events, helper) {
                 return (item.size.coll == 2) ? 'link wide' : 'link';
             });
 
+        if (item.type == 'link') {
+            $li.on('click', link_onClick.bind(this));
+        }
+        else if(item.type == 'group') {
+            $li.on('click', group_onClick.bind(this));
+        }
+
         if (draggable) {
             $li.get(0).addEventListener('dragstart', onDragstart.bind(this), true);
         }
 
-        // mark item if it's already located on the page
-        if (item.pageId == this.layout.selectedPage) {
-            $li.css('backgroundColor', 'red');
-        }
         return $li;
+    }
+
+    function link_onClick (e) {
+        if (e.which != 1 && e.which != 2) { return false; }
+
+        var win = bgTab = tab = false;
+
+        win     = e.which === 1 && e.shiftKey;
+        bgTab   = e.which === 2 && !e.shiftKey;
+        tab     = e.which === 2 && e.shiftKey;
+
+        var itemIdx = getItemIdxByElement.call(this, e.target),
+            item    = this._cache.items[itemIdx];
+
+        if (win) {
+            chrome.windows.create({url: item.data.url});
+            this.layout.trigger('onItemClicked', item.data);
+        }
+        else if(bgTab) {
+            chrome.tabs.create({url: item.data.url, selected: false});
+            this.layout.trigger('onItemClicked', item.data);
+        }
+        else if(tab) {
+            chrome.tabs.create({url: item.data.url, selected: true});
+            this.layout.trigger('onItemClicked', item.data);
+        }
+        else {
+            chrome.tabs.update({url: item.data.url});
+            this.layout.trigger('onItemClicked', item.data);
+        }
+
+        return true;
+    }
+
+    function group_onClick (e) {
+        var itemIdx = getItemIdxByElement.call(this, e.target),
+            item    = this._cache.items[itemIdx];
+        
+        this.hide(true);
+
+        this.layout.pctrl.show(item.id);
+        this.layout.trigger('onItemClicked', item);
+        return true;
+    }
+
+    function getItemIdxByElement (element) {
+        var idxOffset   = (this._cache.pageidx || 0) * itemsPerPage;
+        return idxOffset + $(element).parent().children().index(element);
     }
 
     function onDragstart (e) {
         e.preventDefault();
 
-        var idxOffset   = (this._cache.pageidx || 0) * itemsPerPage,
-            idx         = idxOffset + $(e.target).parent().children().index(e.target),
-            item        = $.extend({}, this._cache.items[idx]);
+        // var idxOffset   = (this._cache.pageidx || 0) * itemsPerPage,
+        var idx  = getItemIdxByElement.call(this, e.target),
+            item = $.extend({}, this._cache.items[idx]);
 
         var page = layout.pctrl.pages[layout.selectedPage];
         
@@ -189,6 +243,8 @@ function ($, config, Events, helper) {
 
         item.pages.push(page.id);
         item.pos[page.id] = pos;
+
+        console.log('jumper', [page.id, pos]);
 
         // create an item on a page silently
         if (item.type == 'link') {

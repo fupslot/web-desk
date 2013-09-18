@@ -33,6 +33,7 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 
 	var layoutOnMouseMoveEvent = function(e) {
 		this.cursor = normalizeCoordinates.call(this, e.clientX, e.clientY);
+
 		// =================
 		// = !!! TEMP CODE =
 		// =================
@@ -53,10 +54,13 @@ function ($, Mustache, helper, config, PageCtrl, Events, t_innerCell) {
 		// cache this values, to prevent recalculate cell's outer size
 		this.cellSize = outerCellSize.call(this);
 		
-		
-		this.$el.append("<div class=\"status\"></div>");
+		// temporary code
+		if (config.showStatus) {
+			this.$el.append("<div class=\"status\"></div>");
+		}
+
 		this.$el.on({
-			"mousemove": function (e) { layoutOnMouseMoveEvent.call(this, e); }.bind(this)
+			'mousemove': function (e) { layoutOnMouseMoveEvent.call(this, e); }.bind(this)
 		});
 
 		this.calculate();

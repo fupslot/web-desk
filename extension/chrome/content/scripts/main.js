@@ -34,21 +34,29 @@ require(
 	'app/layout',
 	'app/Events',
 	'app/bin',
+	'app/sheets',
 	'app/chrome/services',
 	'components/NewItem',
 	'components/Jumper'
 ],
 
-function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
+function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jumper) {
 	window.layout = null;
+
+	window.jumper = null;
+	window.sheets = null;
+
 
 	window.newItem = new NewItem('#new-item');
 
+	// ==================
+	// = temporary code =
+	// ==================
 	$('body > form').on('submit', function(e){
 		e.preventDefault();
-		
+	
 		var ct = e.currentTarget;
-// debugger;
+
 		var 
 			url 		= ct.querySelector('[name=url]').value,
 			title 		= ct.querySelector('[name=title]').value,
@@ -73,6 +81,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 			});	
 		}
 	});
+	// ==================	
 
 
 	// ==========================
@@ -83,10 +92,14 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 			layout.calculate();
 		}
 	});
+	// ==========================
 
-	function onPageChanged (pageId) {
+	// =================
+	// = Layout Events =
+	// =================
+	function onPageChanged (page) {
 		Services('storage', function(storage) {
-			storage.selectedPage = pageId;
+			storage.selectedPage = page.id;
 		});
 	}
 	
@@ -116,6 +129,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 	}
 
 	function onPageData(page, callback) {
+		console.log('onPageData', page);
 		Services('storage', function(storage) {
 			callback(storage.getItems({pageId:page.id}));
 		});
@@ -123,7 +137,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 
 	function onItemRemoved (page, item, canceled) {
 		Services('storage', function(storage) {
-			storage.removeItem(item.data, page.id);
+			storage.removeItem(page, item.data);
 		});
 	}
 
@@ -135,6 +149,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 			jumper.hide();
 		}
 	}
+	// =================
 	
 	Services('storage', function(storage) {
 		layout = new Layout($("div.layout"), {
@@ -153,9 +168,13 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 		
 		layout.load();
 
-		window.jumper = new Jumper(layout);
+		sheets = new Sheets(layout);
+		sheets.on('onSheetChanged', function (sheetIdx) {
+			layout.pctrl.show(sheetIdx);
+		});
 
-		window.jumper.on('onShow', function () {
+		jumper = new Jumper(layout);
+		jumper.on('onShow', function () {
 			Services('storage', function (storage) {
 				jumper._cache.items = storage.getItems();
 				
@@ -163,7 +182,7 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 			});
 		});
 
-		window.jumper.on('onSearchRequest', function (value, keyCode) {
+		jumper.on('onSearchRequest', function (value, keyCode) {
 			Services('storage', function (storage) {
 				jumper._cache.items = storage.getItems(value);
 				jumper.showItems();
@@ -171,11 +190,10 @@ function ($, helper, config, Layout, Events, Bin, Services, NewItem, Jumper) {
 		});
 
 		// this event occurs when item was dragged from jumper to a page
-		window.jumper.on('onItemPlaced', function (item, page, pos) {
+		jumper.on('onItemPlaced', function (item, page, pos) {
 			Services('storage', function (storage) {
-				storage.updateItemPosition(item, page, pos);
-				// jumper._cache.items = storage.getItems(value);
-				// jumper.showItems();
+				// storage.updateItemPosition(item, page, pos);
+				storage.touchItem(item);
 			});
 		});
 	});

@@ -68,21 +68,26 @@ function (Page, helper, Events) {
 		},
 
 		show: function(id, group) {
-			if (this.layout.selectedPage == id) { return; }
-			if (typeof this.pages[id] === 'undefined') {
-				this.pages[id] = new Page(this, id, group);
+			id += '';
+
+			var page = this.pages[id];
+
+			if (this.layout.selectedPage === id) { return; }
+			if (typeof page === 'undefined') {
+				page = new Page(this, id, group);
+				this.pages[id] = page;
 				// ask a group data from 
-				this.layout.trigger('onPageData', id, function(pageData) {
+				this.layout.trigger('onPageData', page, function(pageData) {
 					if (!pageData) { return; }
 					
-					this.pages[id].load(pageData);
+					page.load(pageData);
 					animatedPageSwitch.call(this, id);
 				}.bind(this));
 			}
 			else {
 				animatedPageSwitch.call(this, id);
 			}
-			this.layout.trigger('onPageChanged', id);
+			this.layout.trigger('onPageChanged', page);
 		}
 	};
 

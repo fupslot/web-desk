@@ -36,6 +36,10 @@ function ($, Mustache, helper) {
             if (!this.data.size) {
                 this.data.size = DEF_SIZE;
             }
+
+            if (!this.data.lastAccess) {
+                this.data.lastAccess = (new Date()).getTime();
+            }
             
             if (!this.data.pos) {
                 // as soon as the item can be placed 
