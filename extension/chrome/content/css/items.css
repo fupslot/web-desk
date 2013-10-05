@@ -1,23 +1,22 @@
 .layout .page .link {
-	-webkit-box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
-	box-shadow: 2px 2px 3px rgba(0,0,0,0.5);
-
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	user-select: none;
-	
-	border-radius: 5px;
 
 	position: absolute;
 	z-index: 10;
-
 	cursor: pointer;
-	background-color: white;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-size: contain;
-	border: 4px solid transparent;
+
+	background: #292929 url(../images/themes/dark/thumb-bg.png) 1px 0;
+	padding: 6px;
+	border: solid 1px #111;
+	border-bottom-color: #000;
+	-webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 1px 2px rgba(0,0,0,.4);
+	-moz-box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 1px 2px rgba(0,0,0,.4);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.13), 0 1px 2px rgba(0,0,0,.4);
 	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
 }
 
 .layout .page .link.loading {
@@ -27,5 +26,15 @@
 	background-image: url(../images/image-loader.gif);
 }
 .layout .page .link.broken {
-	background-image: url(../images/broken-image.gif);
+	background-image: url(../images/broken-image.png), url(../images/themes/dark/thumb-bg.png);
+	background-position: center, 1px 0;
+	background-size: contain, auto; 
+	background-repeat: no-repeat, repeat;
+}
+
+.layout .page .link .content {
+	width: 100%;
+	height: 100%;
+	background-size: contain;
+	background-repeat: no-repeat;
 }

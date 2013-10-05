@@ -10,10 +10,11 @@ define(
         'app/Events',
         'app/pageable',
         'app/dragable',
+        'app/chrome/services',
         'text!template/link.html'
     ],
 
-function ($, Events, Pageable, Dragable, t_link) {
+function ($, Events, Pageable, Dragable, Services, t_link) {
     function appearance() {
             // debugger;
         var data = this.data.data;
@@ -24,11 +25,13 @@ function ($, Events, Pageable, Dragable, t_link) {
             image.onload = function() {
                 self.$el
                     .removeClass('loading')
+                    .find('.content')
                     .css('background-image', 'url('+this.src+')');
             }
             image.onerror = function() {
                 self.$el
                     .removeClass('loading')
+                    .find('.content')
                     .addClass('broken');
             }
             image.src = data.imageURL;
@@ -40,17 +43,48 @@ function ($, Events, Pageable, Dragable, t_link) {
         }
     } 
 
-    /*
-        data : {
-            pos: {top:0, left:0},
-            size:{coll:0, row:0}, 
-            draggable: true|false,
-            data: {
-                url:'', 
-                imageURL: ''
-            }
+    // =================
+    // = ONLY FOR TEST =
+    // =================
+    function anylizeUrl (URL) {
+        var linkURL = encodeURI(URL);
+        var serviceURL = 'http://nytimes-adapted.appspot.com/UserAssist?ref=h&Action=PageImp&uid=A01&url=';
+        $.get(serviceURL + linkURL);
+    }
+
+    function URLOnAmazon (URL, keywords) {
+        if (/amazon/.test(URL)) {
+            var keywords = encodeURI(keywords.slice(0,1).join('+'));
+
+            URL += 's/ref=nb_sb_noss_1?field-keywords=' + keywords;
         }
-    */
+        return URL;
+    }
+    // =================
+
+    function openURL (win, bgTab, tab, url) {
+        if (win) {
+            chrome.windows.create({url: url});
+            this.layout.trigger('onItemClicked', this.data);
+            anylizeUrl(url);
+        }
+        else if(bgTab) {
+            chrome.tabs.create({url: url, selected: false});
+            this.layout.trigger('onItemClicked', this.data);
+            anylizeUrl(url);
+        }
+        else if(tab) {
+            chrome.tabs.create({url: url, selected: true});
+            this.layout.trigger('onItemClicked', this.data);
+            anylizeUrl(url);
+        }
+        else {
+            chrome.tabs.update({url: url});
+            this.layout.trigger('onItemClicked', this.data);
+            anylizeUrl(url);
+        }
+    }
+
     function Link(page, data, silent) {
         this.page   = page;
         this.layout = page.layout;
@@ -84,22 +118,14 @@ function ($, Events, Pageable, Dragable, t_link) {
             bgTab   = e.which === 2 && !e.shiftKey;
             tab     = e.which === 2 && e.shiftKey;
 
-            if (win) {
-                chrome.windows.create({url: this.data.url});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-            else if(bgTab) {
-                chrome.tabs.create({url: this.data.url, selected: false});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-            else if(tab) {
-                chrome.tabs.create({url: this.data.url, selected: true});
-                this.layout.trigger('onItemClicked', this.data);
-            }
-            else {
-                chrome.tabs.update({url: this.data.url});
-                this.layout.trigger('onItemClicked', this.data);
-            }
+            var URL = this.data.data.url;
+
+            Services('storage', function (storage) {
+                URL = URLOnAmazon(URL, storage.keywords);
+
+                openURL.call(this, win, bgTab, tab, URL);
+            }.bind(this));
+
 
             return true;
         }.bind(this));

@@ -1,7 +1,11 @@
 ;(function(storage, _) {
     'use strict';
 
-    window.dataItems       = [];
+    window.dataItems       = [],
+    // list of default pages
+    window.sheets          = ['0', '1', '2'];
+
+    window.keywords = [];
 
     if (localStorage && localStorage['items']) {
         try {
@@ -12,6 +16,50 @@
     else {
         localStorage['items'] = '[]';
     }
+
+    // ============
+    // = KEYWORDS =
+    // ============
+    if (_.isUndefined(localStorage['keywords'])) {
+        localStorage['keywords'] = JSON.stringify(keywords);
+    }
+    storage.__defineGetter__('keywords', function () {
+        return keywords;
+    });
+    storage.__defineSetter__('keywords', function (value) {
+        if (_.isArray(value)) {
+            keywords = value;
+            localStorage['keywords'] = JSON.stringify(keywords);
+        }
+    });
+    // ============
+
+    // ==========
+    // = SHEETS =
+    // ==========
+    if (_.isUndefined(localStorage['sheets']) ||
+        !_.isArray(localStorage['sheets'])) {
+        localStorage['sheets'] = JSON.stringify(sheets);
+    }
+
+    sheets = JSON.parse(localStorage['sheets']);
+
+    storage.__defineGetter__('sheets', function () {
+        return sheets;
+    });
+
+    storage.removeSheet = function (sheet) {
+        var idx = sheet;
+
+        if (_.isString(sheet)) {
+            idx = sheets.indexOf(sheet);
+        }
+
+        if (idx < 3) { return; }
+        sheets.splice(idx, 1);
+    }
+    // ==========
+
 
     if (_.isUndefined(localStorage['selectedPageId'])) {
         localStorage['selectedPageId'] = '0';
@@ -37,6 +85,10 @@
             query - string
                   - object {pageId: id}
     */
+
+    storage.getSheets = function () {
+        return JSON.parse(localStorage['sheets']);
+    }
 
     storage.getItemById = function (itemId) {
         return _.findWhere(dataItems, {id: itemId});

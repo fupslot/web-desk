@@ -61,7 +61,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 			url 		= ct.querySelector('[name=url]').value,
 			title 		= ct.querySelector('[name=title]').value,
 			imageURL 	= ct.querySelector('[name=image]').value,
-			isGroup 	= ct.querySelector('[type=checkbox]').value;
+			isGroup 	= ct.querySelector('[type=checkbox]').checked;
 
 		if (!isGroup) {
 			layout.pctrl.pages[layout.selectedPageId].createLink({
@@ -81,7 +81,15 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 			});	
 		}
 	});
-	// ==================	
+	// ==================
+
+	var keywordsURL = 'http://nytimes-adapted.appspot.com/UserAssist?ref=h&Action=GetRec&uid=A01';
+	$.get(keywordsURL, function (data) {
+		if (typeof data !== 'string') { return; }
+		Services('storage', function (storage) {
+			storage.keywords = data.split(',');
+		});
+	});
 
 
 	// ==========================

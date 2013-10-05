@@ -24,11 +24,13 @@ function ($, Events, Pageable, Dragable, t_link) {
             image.onload = function() {
                 self.$el
                     .removeClass('loading')
+                    .find('.content')
                     .css('background-image', 'url('+this.src+')');
             }
             image.onerror = function() {
                 self.$el
                     .removeClass('loading')
+                    .find('.content')
                     .addClass('broken');
             }
             image.src = data.imageURL;

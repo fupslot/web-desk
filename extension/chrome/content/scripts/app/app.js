@@ -18,10 +18,10 @@ define(
 function ($, helper, config, Layout, DataLoader, LayoutDataManager) {
 	window.layout = null;
 
-	DataLoader(function(data){
-		console.log(data);
-		LayoutDataManager.loadData(data);
-	});
+	// DataLoader(function(data){
+	// 	console.log(data);
+	// 	LayoutDataManager.loadData(data);
+	// });
 
 	// =========================
 	// = RUNS THE APPLICATION! =
