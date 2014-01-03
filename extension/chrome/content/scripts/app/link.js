@@ -109,7 +109,7 @@ function ($, Events, Pageable, Dragable, Services, t_link) {
         appearance.call(this);
 
 
-        this.$el.on('click', function(e) {
+        this.$el.on('click', 'a', function (e) {
             if (e.which != 1 && e.which != 2) { return false; }
 
             var win = bgTab = tab = false;

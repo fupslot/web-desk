@@ -6,8 +6,10 @@ define(["jquery", "app/bin", 'app/helper'], function ($, Bin, helper) {
         this.layout.trigger('onItemDragStart');
 
         this.__DD = {
-            evt_OnDragend:      DD_onDragend.bind(this),
-            evt_OnMousemove:    DD_onMousemove.bind(this),
+            // evt_OnDragend:      DD_onDragend.bind(this),
+            // evt_OnMousemove:    DD_onMousemove.bind(this),
+            evt_OnDragend:      $.proxy(DD_onDragend,   this),
+            evt_OnMousemove:    $.proxy(DD_onMousemove, this),
             dx: 0, 
             dy: 0,
             bin: null

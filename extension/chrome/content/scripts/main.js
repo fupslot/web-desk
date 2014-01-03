@@ -130,6 +130,7 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 
 	function onItemClicked(item) {
 		Services('storage', function(storage) {
+			// touchItem -> changeAccessTime(item)
 			storage.touchItem(item);
 		});
 	}
@@ -142,7 +143,6 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 
 	function onPageData(page, callback) {
 		Services('storage', function(storage) {
-			
 			// if selectedPage is a group than on its first run 
 			// fetch its group object from storage
 			if (!page.group && !page.layout.isPagePredefined(page.id)) {
@@ -193,25 +193,25 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 
 		jumper = new Jumper(layout);
 		jumper.on('onShow', function () {
-			Services('storage', function (storage) {
+			// Services('storage', function (storage) {
 				jumper._cache.items = storage.getAllItems();
 				
 				jumper.showItems();
-			});
+			// });
 		});
 
 		jumper.on('onSearchRequest', function (value, keyCode) {
-			Services('storage', function (storage) {
+			// Services('storage', function (storage) {
 				jumper._cache.items = storage.searchItems(value);
 				jumper.showItems();
-			});
+			// });
 		});
 
 		// this event occurs when item was dragged from jumper to a page
 		jumper.on('onItemPlaced', function (item, page, pos) {
-			Services('storage', function (storage) {
+			// Services('storage', function (storage) {
 				storage.touchItem(item);
-			});
+			// });
 		});
 	});
 });
