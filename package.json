@@ -1,0 +1,27 @@
+{
+  "name": "web-desk",
+  "version": "0.0.0",
+  "description": "- Write the function by passing a rectangle will fined a suitable place for it and returned: **pageIndex** - a page the place is location on **{top, left}** - coordinates A function should belong to __PageCtrl__ object",
+  "main": "Gruntfile.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/fupslot/web-desk.git"
+  },
+  "author": "",
+  "license": "(c) All Rights Reserved.",
+  "bugs": {
+    "url": "https://github.com/fupslot/web-desk/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-requirejs": "~0.4.1",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-uglify": "~0.2.7"
+  }
+}

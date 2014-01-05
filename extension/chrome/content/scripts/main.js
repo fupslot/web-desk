@@ -14,15 +14,15 @@
 // ==================================================
 
 require.config({
-	"baseUrl": "scripts/lib",
+	"baseUrl": "scripts",
 	"paths": {
-		"jquery": "jquery/jquery",
-		"mustache": "mustache/mustache",
-		"text": "requirejs-text/text",
-		"app": "../app",
-		"components": "../components",
-		"data": "../app/data",
-		"template": "../template"
+		"jquery":     "lib/jquery",
+		"mustache":   "lib/mustache",
+		"text":       "lib/text",
+		"app":        "app",
+		"components": "components",
+		"data":       "app/data",
+		"template":   "template"
 	}
 });
 
