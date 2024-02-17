@@ -1,0 +1,31 @@
+<html>
+<head></head>
+<body>
+
+<script>
+	(function () {
+
+		function EventsHandler () {
+			this.someValue = "Hello World";
+		}
+
+		EventsHandler.prototype = {
+			onMouseUp: function (e) {
+				alert(this.someValue);
+				// debugger;
+				e.currentTarget.removeEventListener("mouseup", this.__onMouseUp, false);
+			},
+
+			register: function () {
+				this.__onMouseUp = this.onMouseUp.bind(this);
+				document.addEventListener("mouseup", this.__onMouseUp, false);
+			}
+		}
+
+		var eventsHandler = new EventsHandler;
+		eventsHandler.register();
+	})();
+</script>
+	
+</body>
+</html>

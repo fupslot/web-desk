@@ -20,7 +20,7 @@
 	"background": {
 		"scripts": [
 			"background.js",
-			"content/scripts/lib/underscore-amd/underscore-min.js",
+			"content/scripts/lib/underscore.js",
 			"storage.js"
 		]
 	},
