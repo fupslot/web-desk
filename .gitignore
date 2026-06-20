@@ -11,6 +11,9 @@ extension/chrome/content/scripts/lib/
 package-lock.json
 npm-debug.log*
 
+# Local Hermes workspace files
+.hermes/
+
 # Chrome extension packages and signing keys
 *.crx
 *.pem
