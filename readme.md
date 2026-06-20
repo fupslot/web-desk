@@ -31,4 +31,32 @@ A function should belong to __PageCtrl__ object
         }
       ]
     }
- 
+
+## Development
+
+This is a legacy Chrome extension that uses Grunt, Bower, and RequireJS.
+
+Install dependencies:
+
+```bash
+npm install --ignore-scripts --no-audit --no-fund
+npm run setup
+```
+
+Validate source files:
+
+```bash
+npm run validate
+```
+
+Build the RequireJS bundle:
+
+```bash
+npm run build
+```
+
+Run the full validation/build check:
+
+```bash
+npm test
+```
