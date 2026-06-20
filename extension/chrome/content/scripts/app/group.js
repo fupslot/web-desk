@@ -7,7 +7,7 @@
 define(
     [
         'jquery',
-        'app/Events',
+        'app/events',
         'app/pageable',
         'app/dragable',
         'text!template/link.html'
@@ -15,7 +15,6 @@ define(
 
 function ($, Events, Pageable, Dragable, t_link) {
     function appearance() {
-            // debugger;
         var data = this.data.data;
 
         if (data.imageURL) {
@@ -78,7 +77,6 @@ function ($, Events, Pageable, Dragable, t_link) {
 
 
         this.$el.on('click', function(e) {
-            console.log(this.data);
             this.layout.pctrl.show(this.data.id, this.data);
             this.layout.trigger('onItemClicked', this);
             return true;

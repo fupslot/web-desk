@@ -221,8 +221,6 @@ function ($, config, Events, helper) {
             dim: dim
         };
 
-        console.log(this.__DD);
-
         document.addEventListener('mouseup', this.__DD.evt_OnDragend, false);
         document.addEventListener('mousemove', this.__DD.evt_OnMousemove, false);
         // hide jumper softly, w/o reset the cache
@@ -243,8 +241,6 @@ function ($, config, Events, helper) {
 
         item.pages.push(page.id);
         item.pos[page.id] = pos;
-
-        console.log('jumper', [page.id, pos]);
 
         // create an item on a page silently
         if (item.type == 'link') {
