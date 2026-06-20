@@ -7,10 +7,11 @@
 define(
 [
     'jquery',
+    'app/config',
     'app/events'
 ],
 
-function ($, Events) {
+function ($, config, Events) {
 
     function init () {
         centralize.call(this);
@@ -32,6 +33,8 @@ function ($, Events) {
 
     function onSend (e) {
         e.preventDefault();
+
+        if (!config.externalServicesEnabled) { return; }
 
         var URL = this.$url.val();
         if (!/^(http|https|ftp)/.test(URL)) {

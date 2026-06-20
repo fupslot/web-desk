@@ -6,6 +6,7 @@ Checks:
 - tracked JSON files parse with Python's json module
 - AMD module imports do not differ from real files only by case
 - known legacy bug patterns are absent
+- external services are disabled by default and unused broad permissions are absent
 """
 
 import json
@@ -108,6 +109,43 @@ def check_known_bug_patterns() -> list[str]:
     return failures
 
 
+def check_security_defaults() -> list[str]:
+    failures: list[str] = []
+
+    config_text = (ROOT / "extension/chrome/content/scripts/app/config.js").read_text(
+        encoding="utf-8", errors="ignore"
+    )
+    if "externalServicesEnabled: false" not in config_text:
+        failures.append("extension/chrome/content/scripts/app/config.js: external services must be disabled by default")
+
+    service_hosts = [
+        "nytimes-adapted.appspot.com",
+        "www.web4devs.com/extension/gallery",
+    ]
+    for file_name in git_files("*.js"):
+        text = (ROOT / file_name).read_text(encoding="utf-8", errors="ignore")
+        for host in service_hosts:
+            if host in text and "externalServicesEnabled" not in text:
+                failures.append(f"{file_name}: external service {host!r} must be gated by config")
+
+    manifest = json.loads((ROOT / "extension/chrome/manifest.json").read_text(encoding="utf-8"))
+    permissions = set(manifest.get("permissions", []))
+    unused_permissions = {
+        "contextMenus",
+        "webNavigation",
+        "history",
+        "bookmarks",
+        "management",
+        "topSites",
+        "http://*/*",
+        "https://*/*",
+    }
+    for permission in sorted(permissions & unused_permissions):
+        failures.append(f"extension/chrome/manifest.json: remove unused/broad permission {permission!r}")
+
+    return failures
+
+
 def report(name: str, failures: list[str]) -> bool:
     if failures:
         print(f"{name}: FAIL", file=sys.stderr)
@@ -127,6 +165,7 @@ def main() -> int:
     ok &= report("JSON parse", check_json(json_files))
     ok &= report("AMD module case check", check_amd_module_case())
     ok &= report("Known bug pattern check", check_known_bug_patterns())
+    ok &= report("Security defaults check", check_security_defaults())
 
     return 0 if ok else 1
 
