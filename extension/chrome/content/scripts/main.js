@@ -49,13 +49,15 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 
 	window.newItem = new NewItem('#new-item');
 
-	var keywordsURL = 'http://nytimes-adapted.appspot.com/UserAssist?ref=h&Action=GetRec&uid=A01';
-	$.get(keywordsURL, function (data) {
-		if (typeof data !== 'string') { return; }
-		Services('storage', function (storage) {
-			storage.keywords = data.split(',');
+	if (config.externalServicesEnabled) {
+		var keywordsURL = 'http://nytimes-adapted.appspot.com/UserAssist?ref=h&Action=GetRec&uid=A01';
+		$.get(keywordsURL, function (data) {
+			if (typeof data !== 'string') { return; }
+			Services('storage', function (storage) {
+				storage.keywords = data.split(',');
+			});
 		});
-	});
+	}
 
 
 	// ==========================

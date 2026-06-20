@@ -7,6 +7,7 @@
 define(
     [
         'jquery',
+        'app/config',
         'app/events',
         'app/pageable',
         'app/dragable',
@@ -14,7 +15,7 @@ define(
         'text!template/link.html'
     ],
 
-function ($, Events, Pageable, Dragable, Services, t_link) {
+function ($, config, Events, Pageable, Dragable, Services, t_link) {
     function appearance() {
         var data = this.data.data;
 
@@ -46,6 +47,8 @@ function ($, Events, Pageable, Dragable, Services, t_link) {
     // = ONLY FOR TEST =
     // =================
     function anylizeUrl (URL) {
+        if (!config.externalServicesEnabled) { return; }
+
         var linkURL = encodeURI(URL);
         var serviceURL = 'http://nytimes-adapted.appspot.com/UserAssist?ref=h&Action=PageImp&uid=A01&url=';
         $.get(serviceURL + linkURL);
