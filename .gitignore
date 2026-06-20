@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+vendors/
+
+# Build output
+release/
+build/release/
+extension/chrome/content/scripts/lib/
+
+# Local package-manager artifacts
+package-lock.json
+npm-debug.log*
+
+# Chrome extension packages and signing keys
+*.crx
+*.pem

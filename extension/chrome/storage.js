@@ -199,8 +199,6 @@
             dataItems.splice(index, 1);
         }
 
-        console.log('storage', [item.pages, item.pos]);
-
         this.save();
     }
 
@@ -239,18 +237,13 @@
                 msg = 'Unknown Error';
             break;
         };
-        console.log('Error: ' + msg);
     }
 
     function saveBlob(category, fileName, blob, success, error) {
         var requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
         requestFileSystem(window.PERSISTENT, null, function(fs) {
-            console.log('FS');
-            
             fs.root.getDirectory(category, {create: true}, function(dirEntry) {
-                console.log('Directory has been created');
                 dirEntry.getFile(fileName, {create: true}, function(fileEntry) {
-                    console.log('File has been created');
                     fileEntry.createWriter(function(fileWriter) {
                         fileWriter.onwriteend = success;
                         fileWriter.onerror = error;

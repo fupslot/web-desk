@@ -7,7 +7,7 @@
 define(
     [
         'jquery',
-        'app/Events',
+        'app/events',
         'app/pageable',
         'app/dragable',
         'app/chrome/services',
@@ -16,7 +16,6 @@ define(
 
 function ($, Events, Pageable, Dragable, Services, t_link) {
     function appearance() {
-            // debugger;
         var data = this.data.data;
 
         if (data.imageURL) {

@@ -1,6 +1,6 @@
 define({
-	showGrid: true,
-	showStatus: true,
+	showGrid: false,
+	showStatus: false,
 	cellSize: {width:32, height:32},
 	cellMargin: {top:16, left:8, bottom:8, right:8},
 

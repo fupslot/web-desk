@@ -32,7 +32,7 @@ require(
 	'app/helper',
 	'app/config',
 	'app/layout',
-	'app/Events',
+	'app/events',
 	'app/bin',
 	'app/sheets',
 	'app/chrome/services',
@@ -48,40 +48,6 @@ function ($, helper, config, Layout, Events, Bin, Sheets, Services, NewItem, Jum
 
 
 	window.newItem = new NewItem('#new-item');
-
-	// ==================
-	// = temporary code =
-	// ==================
-	$('body > form').on('submit', function(e){
-		e.preventDefault();
-	
-		var ct = e.currentTarget;
-
-		var 
-			url 		= ct.querySelector('[name=url]').value,
-			title 		= ct.querySelector('[name=title]').value,
-			imageURL 	= ct.querySelector('[name=image]').value,
-			isGroup 	= ct.querySelector('[type=checkbox]').checked;
-
-		if (!isGroup) {
-			layout.pctrl.pages[layout.selectedPageId].createLink({
-				data: {
-					url: url,
-					title: title,
-					imageURL: imageURL
-				}
-			});
-		}
-		else {
-			layout.pctrl.pages[layout.selectedPageId].createGroup({
-				data: {
-					title: title,
-					imageURL: imageURL
-				}
-			});	
-		}
-	});
-	// ==================
 
 	var keywordsURL = 'http://nytimes-adapted.appspot.com/UserAssist?ref=h&Action=GetRec&uid=A01';
 	$.get(keywordsURL, function (data) {

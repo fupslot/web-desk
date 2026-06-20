@@ -75,7 +75,6 @@ function ($, Events) {
                 this.showResponse();
             }
             catch (ex) {
-                console.log(ex.message);
                 return;
             }
         }

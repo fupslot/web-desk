@@ -108,8 +108,6 @@ function(helper) {
             this._layoutData.pages.forEach(function(page, idx) {
                 this.pages[idx] = new LayoutPageDataManager(page, this);
             }.bind(this));
-
-            console.log('Data was loaded');
         },
 
         getPageSelected: function() {

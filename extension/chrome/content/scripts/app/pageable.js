@@ -16,7 +16,6 @@ function ($, Mustache, helper) {
     return {
         initPageable: function(HTMLtemplate) {
             var DEF_SIZE = {coll: 3, row: 2};
-// debugger            
             // if (!this.data.pageId) {
             //     this.data.pageId = this.page.id;
             // }
@@ -63,7 +62,6 @@ function ($, Mustache, helper) {
 
             
             if (this.data.pos === null) {
-                console.log('No space available on the page id \'%s\'', this.page.id);
                 return;
             }
 

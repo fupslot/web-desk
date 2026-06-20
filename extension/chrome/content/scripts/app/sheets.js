@@ -1,7 +1,7 @@
 define(
     [
         'jquery',
-        'app/Events'
+        'app/events'
     ],
 
 function ($, Events) {
@@ -26,7 +26,6 @@ function ($, Events) {
         this.$el.find('[role=sheet]').on('click', sheet_onClick.bind(this));
 
         // this.selectedPageId = this.layout.selectedPageId;
-// debugger
         // if selected one of the predefined pages
         if (this.layout.isPagePredefined()) {
             var selectedPageId = parseInt(this.layout.selectedPageId);
