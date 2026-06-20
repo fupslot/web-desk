@@ -39,7 +39,7 @@ function ($, config, Surface, Events, Link, Group) {
 		this.pctrl = pageCtrl;
 		this.id = id;
 
-		if (typeof group != 'indefined') {
+		if (typeof group != 'undefined') {
 			this.group = group;
 		}
 		// this.group = typeof group === 'boolean' ? group : false;
