@@ -5,6 +5,7 @@ Checks:
 - tracked JavaScript files parse with `node --check`
 - tracked JSON files parse with Python's json module
 - AMD module imports do not differ from real files only by case
+- known legacy bug patterns are absent
 """
 
 import json
@@ -87,6 +88,26 @@ def check_amd_module_case() -> list[str]:
     return failures
 
 
+def check_known_bug_patterns() -> list[str]:
+    checks = {
+        "extension/chrome/content/scripts/app/page.js": [
+            ("indefined", "misspelled undefined check should be 'undefined'"),
+        ],
+        "extension/chrome/storage.js": [
+            ("this.getItems({pageId: item.id})", "removeItem should not call undefined getItems"),
+            ("!_.isArray(localStorage['sheets'])", "sheets validation must parse localStorage JSON before array check"),
+        ],
+    }
+    failures: list[str] = []
+    for file_name, patterns in checks.items():
+        text = (ROOT / file_name).read_text(encoding="utf-8", errors="ignore")
+        for pattern, message in patterns:
+            if pattern in text:
+                failures.append(f"{file_name}: {message}")
+
+    return failures
+
+
 def report(name: str, failures: list[str]) -> bool:
     if failures:
         print(f"{name}: FAIL", file=sys.stderr)
@@ -105,6 +126,7 @@ def main() -> int:
     ok &= report("JS syntax", run_node_check(js_files))
     ok &= report("JSON parse", check_json(json_files))
     ok &= report("AMD module case check", check_amd_module_case())
+    ok &= report("Known bug pattern check", check_known_bug_patterns())
 
     return 0 if ok else 1
 

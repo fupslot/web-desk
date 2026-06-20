@@ -37,12 +37,18 @@
     // ==========
     // = SHEETS =
     // ==========
-    if (_.isUndefined(localStorage['sheets']) ||
-        !_.isArray(localStorage['sheets'])) {
-        localStorage['sheets'] = JSON.stringify(sheets);
+    var storedSheets = null;
+    try {
+        storedSheets = JSON.parse(localStorage['sheets']);
+    }
+    catch (ex) {}
+
+    if (!_.isArray(storedSheets)) {
+        storedSheets = sheets;
+        localStorage['sheets'] = JSON.stringify(storedSheets);
     }
 
-    sheets = JSON.parse(localStorage['sheets']);
+    sheets = storedSheets;
 
     storage.__defineGetter__('sheets', function () {
         return sheets;
@@ -186,7 +192,7 @@
 
         var isGroupEmpty = true;
         if (item.type == 'group') {
-            var groupItems = this.getItems({pageId: item.id});
+            var groupItems = this.getItemsByPageId(item.id);
             isGroupEmpty = groupItems.length === 0;
         }
         
